@@ -1,0 +1,8 @@
+# Test binary, build with `go test -c`
+*.test
+
+
+vendor/
+/config.yml
+.vscode
+.idea/

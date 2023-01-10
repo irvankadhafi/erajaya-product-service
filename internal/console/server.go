@@ -3,12 +3,12 @@ package console
 import (
 	"context"
 	"fmt"
-	"github.com/irvankadhafi/go-boilerplate/internal/config"
-	"github.com/irvankadhafi/go-boilerplate/internal/db"
-	"github.com/irvankadhafi/go-boilerplate/internal/delivery/httpsvc"
-	"github.com/irvankadhafi/go-boilerplate/internal/helper"
-	"github.com/irvankadhafi/go-boilerplate/internal/repository"
-	"github.com/irvankadhafi/go-boilerplate/internal/usecase"
+	"github.com/irvankadhafi/erajaya-product-service/internal/config"
+	"github.com/irvankadhafi/erajaya-product-service/internal/db"
+	"github.com/irvankadhafi/erajaya-product-service/internal/delivery/httpsvc"
+	"github.com/irvankadhafi/erajaya-product-service/internal/helper"
+	"github.com/irvankadhafi/erajaya-product-service/internal/repository"
+	"github.com/irvankadhafi/erajaya-product-service/internal/usecase"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/labstack/gommon/log"
@@ -39,11 +39,10 @@ func runServer(cmd *cobra.Command, args []string) {
 	continueOrFatal(err)
 	defer helper.WrapCloser(pgDB.Close)
 
-	helloRepository := repository.NewHelloRepository(db.PostgreSQL)
-	helloUsecase := usecase.NewHelloUsecase(helloRepository)
+	productRepository := repository.NewProductRepository(db.PostgreSQL)
+	productUsecase := usecase.NewProductUsecase(productRepository)
 
 	httpServer := echo.New()
-	//httpMiddleware := auth.NewAuthenticationMiddleware(userAuther)
 
 	httpServer.Pre(middleware.AddTrailingSlash())
 	httpServer.Use(middleware.Logger())
@@ -51,7 +50,7 @@ func runServer(cmd *cobra.Command, args []string) {
 	httpServer.Use(middleware.CORS())
 
 	apiGroup := httpServer.Group("/api")
-	httpsvc.RouteService(apiGroup, helloUsecase)
+	httpsvc.RouteService(apiGroup, productUsecase)
 
 	sigCh := make(chan os.Signal, 1)
 	errCh := make(chan error, 1)

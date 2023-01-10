@@ -1,9 +1,9 @@
 package console
 
 import (
-	"github.com/irvankadhafi/go-boilerplate/internal/config"
-	"github.com/irvankadhafi/go-boilerplate/internal/db"
-	"github.com/irvankadhafi/go-boilerplate/utils"
+	"github.com/irvankadhafi/erajaya-product-service/internal/config"
+	"github.com/irvankadhafi/erajaya-product-service/internal/db"
+	"github.com/irvankadhafi/erajaya-product-service/utils"
 	migrate "github.com/rubenv/sql-migrate"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"

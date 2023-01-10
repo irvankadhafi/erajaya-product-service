@@ -3,7 +3,7 @@ package db
 import (
 	"context"
 	"fmt"
-	"github.com/irvankadhafi/go-boilerplate/internal/config"
+	"github.com/irvankadhafi/erajaya-product-service/internal/config"
 	"github.com/jpillora/backoff"
 	log "github.com/sirupsen/logrus"
 	"gorm.io/driver/postgres"
