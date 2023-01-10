@@ -1,0 +1,14 @@
+env: "development"
+log_level: "debug"
+ports:
+  http: "3000"
+postgres:
+  host: "localhost:25432"
+  database: "go-boilerplate"
+  username: "irvankdhf"
+  password: "irvankdhf"
+  sslmode: "disable"
+  max_idle_conns: 2
+  conn_max_lifetime: "1h"
+  ping_interval: "5000ms"
+  retry_attempts: 3
