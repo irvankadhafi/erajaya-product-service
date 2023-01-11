@@ -25,6 +25,7 @@ func NewProductRepository(db *gorm.DB, cache cache.Cache) model.ProductRepositor
 	}
 }
 
+// FindByID find product by id
 func (p *productRepository) FindByID(ctx context.Context, id int64) (*model.Product, error) {
 	logger := logrus.WithFields(logrus.Fields{
 		"ctx":       utils.DumpIncomingContext(ctx),
@@ -104,6 +105,7 @@ func (p *productRepository) FindBySlug(ctx context.Context, slug string) (*model
 	return p.FindByID(ctx, id)
 }
 
+// Create create product
 func (p *productRepository) Create(ctx context.Context, product *model.Product) error {
 	logger := logrus.WithFields(logrus.Fields{
 		"ctx":     utils.DumpIncomingContext(ctx),
@@ -122,6 +124,7 @@ func (p *productRepository) Create(ctx context.Context, product *model.Product) 
 	return nil
 }
 
+// SearchByPage find all product with specific criteria
 func (p *productRepository) SearchByPage(ctx context.Context, criteria model.ProductSearchCriteria) (ids []int64, count int64, err error) {
 	logger := logrus.WithFields(logrus.Fields{
 		"ctx":      utils.DumpIncomingContext(ctx),

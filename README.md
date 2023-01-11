@@ -6,7 +6,7 @@ Konsep yang digunakan pada sevice ini ialah clean architecture.
 Tiap komponen tidak bergantung pada framework ataupun database yang digunakan (independen). Konsep ini di kemukakan oleh Uncle Bob yang bisa dibaca pada artikel berikut https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html.
 
 
-
+# Project Structure
 ```bash
 .
 ├── cache/
@@ -24,6 +24,9 @@ Tiap komponen tidak bergantung pada framework ataupun database yang digunakan (i
 │   └── delivery/
 │   │   # Layer ini bertugas sebagai presenter atau menyajikan output ke client
 │   │   # Banyak metode yang dapat digunakan, seperti: HTTP REST API, gRPC, GraphQL. Pada kasus ini saya menggunakan HTTP REST API
+│   │   │
+│   │   └── http/ 
+│   │   
 │   └── helper/
 │   └── model/
 │   │   # Layer ini menyimpan model yang akan digunakan pada layer lainnya. 

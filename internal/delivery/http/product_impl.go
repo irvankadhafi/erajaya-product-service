@@ -9,13 +9,6 @@ import (
 	"net/http"
 )
 
-type productResponse struct {
-	*model.Product
-	Price     string `json:"price"`
-	CreatedAt string `json:"created_at"`
-	UpdatedAt string `json:"updated_at"`
-}
-
 func (s *Service) handleCreateProduct() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		ctx := c.Request().Context()
@@ -23,13 +16,18 @@ func (s *Service) handleCreateProduct() echo.HandlerFunc {
 			"ctx": utils.DumpIncomingContext(ctx),
 		})
 
-		req := model.CreateProductInput{}
+		req := createProductRequest{}
 		if err := c.Bind(&req); err != nil {
 			logrus.Error(err)
 			return ErrInvalidArgument
 		}
 
-		product, err := s.productUsecase.Create(ctx, req)
+		product, err := s.productUsecase.Create(ctx, model.CreateProductInput{
+			Name:        req.Name,
+			Description: req.Description,
+			Price:       utils.StringToInt64(req.Price),
+			Quantity:    req.Quantity,
+		})
 		switch err {
 		case nil:
 			break

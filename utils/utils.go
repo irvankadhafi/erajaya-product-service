@@ -52,6 +52,15 @@ func StringToInt(s string) int {
 	return i
 }
 
+// StringToInt64 :nodoc:
+func StringToInt64(s string) int64 {
+	i, err := strconv.ParseInt(s, 10, 64)
+	if err != nil {
+		return 0
+	}
+	return i
+}
+
 // Int64ToString :nodoc:
 func Int64ToString(i int64) string {
 	s := strconv.FormatInt(i, 10)

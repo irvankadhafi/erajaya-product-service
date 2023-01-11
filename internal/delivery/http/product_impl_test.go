@@ -10,7 +10,6 @@ import (
 	"github.com/irvankadhafi/erajaya-product-service/internal/model/mock"
 	"github.com/irvankadhafi/erajaya-product-service/utils"
 	"github.com/labstack/echo/v4"
-	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/require"
 	"io"
 	"net/http"
@@ -33,10 +32,10 @@ func TestHTTP_handleCreateProduct(t *testing.T) {
 		Quantity:    10,
 	}
 
-	inputProduct := model.CreateProductInput{
+	inputProduct := createProductRequest{
 		Name:        product.Name,
 		Description: product.Description,
-		Price:       product.Price,
+		Price:       utils.Int64ToString(product.Price),
 		Quantity:    product.Quantity,
 	}
 
@@ -51,7 +50,7 @@ func TestHTTP_handleCreateProduct(t *testing.T) {
 		{
 			"name": "Apple iPhone 14 Pro Max",
 			"description": "Apple iPhone 14 Pro Max",
-			"price": 19000000,
+			"price": "19000000",
 			"quantity": 10
 		}`,
 		))
@@ -61,7 +60,12 @@ func TestHTTP_handleCreateProduct(t *testing.T) {
 		echoCtx := ec.NewContext(req, rec)
 		ctx := context.TODO()
 
-		mockProductUsecase.EXPECT().Create(ctx, inputProduct).Times(1).Return(product, nil)
+		mockProductUsecase.EXPECT().Create(ctx, model.CreateProductInput{
+			Name:        inputProduct.Name,
+			Description: inputProduct.Description,
+			Price:       utils.StringToInt64(inputProduct.Price),
+			Quantity:    inputProduct.Quantity,
+		}).Times(1).Return(product, nil)
 
 		err := server.handleCreateProduct()(echoCtx)
 		require.NoError(t, err)
@@ -80,7 +84,7 @@ func TestHTTP_handleCreateProduct(t *testing.T) {
 		{
 			"name": "Apple iPhone 14 Pro Max",
 			"description": "Apple iPhone 14 Pro Max",
-			"price": 19000000,
+			"price": "19000000",
 			"quantity": 10
 		}`,
 		))
@@ -90,7 +94,12 @@ func TestHTTP_handleCreateProduct(t *testing.T) {
 		echoCtx := ec.NewContext(req, rec)
 		ctx := context.TODO()
 
-		mockProductUsecase.EXPECT().Create(ctx, inputProduct).Times(1).Return(nil, errors.New("usecase error"))
+		mockProductUsecase.EXPECT().Create(ctx, model.CreateProductInput{
+			Name:        inputProduct.Name,
+			Description: inputProduct.Description,
+			Price:       utils.StringToInt64(inputProduct.Price),
+			Quantity:    inputProduct.Quantity,
+		}).Times(1).Return(nil, errors.New("usecase error"))
 
 		err := server.handleCreateProduct()(echoCtx)
 		ec.DefaultHTTPErrorHandler(err, echoCtx)
@@ -125,7 +134,6 @@ func TestHTTP_handleGetAllProducts(t *testing.T) {
 	urlVal.Add("size", utils.Int64ToString(int64(criteria.Size)))
 	urlVal.Add("sortBy", string(criteria.SortType))
 	queryParam := urlVal.Encode()
-	logrus.Warn("QUERY PARAM >>>>> ", queryParam)
 
 	t.Run("ok", func(t *testing.T) {
 		ec := echo.New()
