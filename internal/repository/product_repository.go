@@ -86,7 +86,7 @@ func (p *productRepository) SearchByPage(ctx context.Context, criteria model.Pro
 		"criteria": utils.Dump(criteria),
 	})
 
-	err = p.db.Debug().WithContext(ctx).Model(model.Product{}).
+	err = p.db.WithContext(ctx).Model(model.Product{}).
 		Count(&count).
 		Error
 	if err != nil {

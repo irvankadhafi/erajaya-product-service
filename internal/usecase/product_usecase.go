@@ -44,9 +44,12 @@ func (p *productUsecase) FindAllByIDs(ctx context.Context, ids []int64) []*model
 		"ids": ids,
 	})
 
+	// WaitGroup to wait for all goroutines to finish
 	var wg sync.WaitGroup
+	// Creating channel to receive found products
 	c := make(chan *model.Product, len(ids))
 
+	// Iterating through received ids
 	for _, id := range ids {
 		wg.Add(1)
 		go func(id int64) {
@@ -66,7 +69,7 @@ func (p *productUsecase) FindAllByIDs(ctx context.Context, ids []int64) []*model
 		return nil
 	}
 
-	// Put 'em in a buffer
+	// put all products in a map with product id as key
 	rs := map[int64]*model.Product{}
 	for product := range c {
 		if product != nil {
@@ -74,7 +77,7 @@ func (p *productUsecase) FindAllByIDs(ctx context.Context, ids []int64) []*model
 		}
 	}
 
-	// Sort 'em out
+	// sort products based on the order of received ids
 	var products []*model.Product
 	for _, id := range ids {
 		if product, ok := rs[id]; ok {
@@ -105,13 +108,13 @@ func (p *productUsecase) Create(ctx context.Context, input model.CreateProductIn
 		Description: input.Description,
 		Quantity:    input.Quantity,
 	}
-	logrus.Warn("WOW: ", utils.Dump(product))
+
 	err = p.productRepo.Create(ctx, product)
 	if err != nil {
 		logger.Error(err)
 		return nil, err
 	}
-	logrus.Warn("WOW2: ", product.ID)
+
 	return p.FindByID(ctx, product.ID)
 }
 
