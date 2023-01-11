@@ -26,7 +26,7 @@ func (p *productRepository) FindByID(ctx context.Context, id int64) (*model.Prod
 	})
 
 	var product model.Product
-	err := p.db.WithContext(ctx).Take(&product, "id = ?", id).Error
+	err := p.db.Debug().WithContext(ctx).Take(&product, "id = ?", id).Error
 	switch err {
 	case nil:
 		return &product, nil
@@ -59,7 +59,7 @@ func (p *productRepository) SearchByPage(ctx context.Context, criteria model.Pro
 		"criteria": utils.Dump(criteria),
 	})
 
-	err = p.db.WithContext(ctx).Model(model.Product{}).
+	err = p.db.Debug().WithContext(ctx).Model(model.Product{}).
 		Count(&count).
 		Error
 	if err != nil {
@@ -71,14 +71,10 @@ func (p *productRepository) SearchByPage(ctx context.Context, criteria model.Pro
 		return nil, 0, nil
 	}
 
-	err = p.db.WithContext(ctx).
+	err = p.db.Debug().WithContext(ctx).
 		Model(model.Product{}).
-		Scopes(
-			orderByCreatedAtAsc,
-			withNameLike(criteria.Query),
-			withSize(criteria.Size),
-			withOffset(utils.Offset(criteria.Page, criteria.Size)),
-		).
+		Scopes(scopeByPageAndLimit(criteria.Page, criteria.Size)).
+		Order(orderByProductSortType(criteria.SortType)).
 		Pluck("id", &ids).Error
 	switch err {
 	case nil:
@@ -89,4 +85,12 @@ func (p *productRepository) SearchByPage(ctx context.Context, criteria model.Pro
 		logger.Error(err)
 		return nil, 0, err
 	}
+}
+
+func orderByProductSortType(sortType model.ProductSortType) string {
+	if orderBy, ok := model.QueryProductSortByMap[sortType]; ok {
+		return orderBy
+	}
+
+	return model.QueryProductSortByMap[model.ProductSortTypeCreatedAtDesc]
 }

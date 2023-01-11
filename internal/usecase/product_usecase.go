@@ -9,13 +9,13 @@ import (
 )
 
 type productUsecase struct {
-	productRepository model.ProductRepository
+	productRepo model.ProductRepository
 }
 
 // NewProductUsecase instantiate a new product usecase
-func NewProductUsecase(productRepository model.ProductRepository) model.ProductUsecase {
+func NewProductUsecase(productRepo model.ProductRepository) model.ProductUsecase {
 	return &productUsecase{
-		productRepository: productRepository,
+		productRepo: productRepo,
 	}
 }
 
@@ -25,7 +25,7 @@ func (p *productUsecase) FindByID(ctx context.Context, id int64) (*model.Product
 		"productID": id,
 	})
 
-	product, err := p.productRepository.FindByID(ctx, id)
+	product, err := p.productRepo.FindByID(ctx, id)
 	if err != nil {
 		logger.Error(err)
 		return nil, err
@@ -103,7 +103,7 @@ func (p *productUsecase) Create(ctx context.Context, input model.CreateProductIn
 		Description: input.Description,
 		Quantity:    input.Quantity,
 	}
-	err = p.productRepository.Create(ctx, product)
+	err = p.productRepo.Create(ctx, product)
 	if err != nil {
 		logger.Error(err)
 		return nil, err
@@ -118,7 +118,7 @@ func (p *productUsecase) Search(ctx context.Context, criteria model.ProductSearc
 		"criteria": utils.Dump(criteria),
 	})
 
-	productIDs, count, err := p.productRepository.SearchByPage(ctx, criteria)
+	productIDs, count, err := p.productRepo.SearchByPage(ctx, criteria)
 	if err != nil {
 		logger.Error(err)
 		return nil, 0, err

@@ -3,20 +3,26 @@ module github.com/irvankadhafi/erajaya-product-service
 go 1.18
 
 require (
+	github.com/DATA-DOG/go-sqlmock v1.5.0
+	github.com/banzaicloud/logrus-runtime-formatter v0.0.0-20190729070250-5ae5475bae5e
 	github.com/go-playground/validator v9.31.0+incompatible
+	github.com/golang/mock v1.6.0
 	github.com/jpillora/backoff v1.0.0
 	github.com/labstack/echo/v4 v4.10.0
 	github.com/labstack/gommon v0.4.0
 	github.com/rubenv/sql-migrate v1.3.0
+	github.com/shopspring/decimal v1.3.1
 	github.com/sirupsen/logrus v1.9.0
 	github.com/spf13/cobra v1.6.1
 	github.com/spf13/viper v1.14.0
+	github.com/stretchr/testify v1.8.1
 	google.golang.org/grpc v1.50.1
 	gorm.io/driver/postgres v1.4.6
 	gorm.io/gorm v1.24.3
 )
 
 require (
+	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/fsnotify/fsnotify v1.6.0 // indirect
 	github.com/go-gorp/gorp/v3 v3.0.2 // indirect
 	github.com/go-playground/locales v0.14.1 // indirect
@@ -36,6 +42,7 @@ require (
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
 	github.com/pelletier/go-toml v1.9.5 // indirect
 	github.com/pelletier/go-toml/v2 v2.0.5 // indirect
+	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/spf13/afero v1.9.2 // indirect
 	github.com/spf13/cast v1.5.0 // indirect
 	github.com/spf13/jwalterweatherman v1.1.0 // indirect
