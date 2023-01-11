@@ -1,4 +1,4 @@
-package httpsvc
+package http
 
 import (
 	"github.com/irvankadhafi/erajaya-product-service/internal/model"

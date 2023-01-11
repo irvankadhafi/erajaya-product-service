@@ -1,4 +1,4 @@
-package httpsvc
+package http
 
 import (
 	"fmt"

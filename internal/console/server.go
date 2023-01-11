@@ -6,7 +6,7 @@ import (
 	"github.com/irvankadhafi/erajaya-product-service/cache"
 	"github.com/irvankadhafi/erajaya-product-service/internal/config"
 	"github.com/irvankadhafi/erajaya-product-service/internal/db"
-	"github.com/irvankadhafi/erajaya-product-service/internal/delivery/httpsvc"
+	"github.com/irvankadhafi/erajaya-product-service/internal/delivery/http"
 	"github.com/irvankadhafi/erajaya-product-service/internal/helper"
 	"github.com/irvankadhafi/erajaya-product-service/internal/repository"
 	"github.com/irvankadhafi/erajaya-product-service/internal/usecase"
@@ -15,7 +15,7 @@ import (
 	"github.com/labstack/gommon/log"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
-	"net/http"
+	netHttp "net/http"
 	"os"
 	"os/signal"
 	"time"
@@ -59,7 +59,7 @@ func runServer(cmd *cobra.Command, args []string) {
 	httpServer.Use(middleware.CORS())
 
 	apiGroup := httpServer.Group("/api")
-	httpsvc.RouteService(apiGroup, productUsecase)
+	http.RouteService(apiGroup, productUsecase)
 
 	sigCh := make(chan os.Signal, 1)
 	errCh := make(chan error, 1)
@@ -82,7 +82,7 @@ func runServer(cmd *cobra.Command, args []string) {
 
 	go func() {
 		// Start HTTP server
-		if err := httpServer.Start(fmt.Sprintf(":%s", config.HTTPPort())); err != nil && err != http.ErrServerClosed {
+		if err := httpServer.Start(fmt.Sprintf(":%s", config.HTTPPort())); err != nil && err != netHttp.ErrServerClosed {
 			errCh <- err
 		}
 	}()
