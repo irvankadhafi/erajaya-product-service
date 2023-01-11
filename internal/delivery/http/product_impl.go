@@ -2,11 +2,19 @@ package http
 
 import (
 	"github.com/irvankadhafi/erajaya-product-service/internal/model"
+	"github.com/irvankadhafi/erajaya-product-service/internal/usecase"
 	"github.com/irvankadhafi/erajaya-product-service/utils"
 	"github.com/labstack/echo/v4"
 	"github.com/sirupsen/logrus"
 	"net/http"
 )
+
+type productResponse struct {
+	*model.Product
+	Price     string `json:"price"`
+	CreatedAt string `json:"created_at"`
+	UpdatedAt string `json:"updated_at"`
+}
 
 func (s *Service) handleCreateProduct() echo.HandlerFunc {
 	return func(c echo.Context) error {
@@ -25,12 +33,19 @@ func (s *Service) handleCreateProduct() echo.HandlerFunc {
 		switch err {
 		case nil:
 			break
+		case usecase.ErrAlreadyExist:
+			return ErrProductNameAlreadyExist
 		default:
 			logger.Error(err)
 			return httpValidationOrInternalErr(err)
 		}
 
-		return c.JSON(http.StatusCreated, setSuccessResponse(product))
+		return c.JSON(http.StatusCreated, setSuccessResponse(productResponse{
+			Product:   product,
+			Price:     utils.Int64ToRupiah(product.Price),
+			CreatedAt: utils.FormatTimeRFC3339(&product.CreatedAt),
+			UpdatedAt: utils.FormatTimeRFC3339(&product.UpdatedAt),
+		}))
 	}
 }
 
@@ -44,8 +59,8 @@ func (s *Service) handleGetAllProducts() echo.HandlerFunc {
 	}
 
 	type userCursor struct {
-		Items    []*model.Product `json:"items"`
-		MetaInfo *metaInfo        `json:"meta_info"`
+		Items    []productResponse `json:"items"`
+		MetaInfo *metaInfo         `json:"meta_info"`
 	}
 	return func(c echo.Context) error {
 		ctx := c.Request().Context()
@@ -64,7 +79,7 @@ func (s *Service) handleGetAllProducts() echo.HandlerFunc {
 			Query:    query,
 		}
 
-		items, count, err := s.productUsecase.Search(ctx, criterias)
+		products, count, err := s.productUsecase.Search(ctx, criterias)
 		switch err {
 		case nil:
 			break
@@ -73,9 +88,19 @@ func (s *Service) handleGetAllProducts() echo.HandlerFunc {
 			return httpValidationOrInternalErr(err)
 		}
 
+		var productResponses []productResponse
+		for _, product := range products {
+			productResponses = append(productResponses, productResponse{
+				Product:   product,
+				Price:     utils.Int64ToRupiah(product.Price),
+				CreatedAt: utils.FormatTimeRFC3339(&product.CreatedAt),
+				UpdatedAt: utils.FormatTimeRFC3339(&product.UpdatedAt),
+			})
+		}
+
 		hasMore := int(count)-(criterias.Page*criterias.Size) > 0
 		res := userCursor{
-			Items: items,
+			Items: productResponses,
 			MetaInfo: &metaInfo{
 				Size:      size,
 				Count:     int(count),

@@ -7,21 +7,10 @@ import (
 	"net/http"
 )
 
-type errorResponse struct {
-	Success bool `json:"success"`
-	Message any  `json:"message"`
-}
-
-func setErrorMessage(msg any) errorResponse {
-	return errorResponse{
-		Success: false,
-		Message: msg,
-	}
-}
-
 var (
-	ErrInvalidArgument = echo.NewHTTPError(http.StatusBadRequest, setErrorMessage("invalid argument"))
-	ErrInternal        = echo.NewHTTPError(http.StatusInternalServerError, setErrorMessage("internal system error"))
+	ErrInvalidArgument         = echo.NewHTTPError(http.StatusBadRequest, setErrorMessage("invalid argument"))
+	ErrInternal                = echo.NewHTTPError(http.StatusInternalServerError, setErrorMessage("internal system error"))
+	ErrProductNameAlreadyExist = echo.NewHTTPError(http.StatusBadRequest, setErrorMessage("product name already exist"))
 )
 
 // httpValidationOrInternalErr return valdiation or internal error

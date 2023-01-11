@@ -64,6 +64,21 @@ func (mr *MockProductRepositoryMockRecorder) FindByID(arg0, arg1 interface{}) *g
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FindByID", reflect.TypeOf((*MockProductRepository)(nil).FindByID), arg0, arg1)
 }
 
+// FindBySlug mocks base method.
+func (m *MockProductRepository) FindBySlug(arg0 context.Context, arg1 string) (*model.Product, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "FindBySlug", arg0, arg1)
+	ret0, _ := ret[0].(*model.Product)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// FindBySlug indicates an expected call of FindBySlug.
+func (mr *MockProductRepositoryMockRecorder) FindBySlug(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FindBySlug", reflect.TypeOf((*MockProductRepository)(nil).FindBySlug), arg0, arg1)
+}
+
 // SearchByPage mocks base method.
 func (m *MockProductRepository) SearchByPage(arg0 context.Context, arg1 model.ProductSearchCriteria) ([]int64, int64, error) {
 	m.ctrl.T.Helper()

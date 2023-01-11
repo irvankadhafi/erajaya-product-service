@@ -61,6 +61,49 @@ func (p *productRepository) FindByID(ctx context.Context, id int64) (*model.Prod
 	}
 }
 
+// FindBySlug find product with specific slug
+func (p *productRepository) FindBySlug(ctx context.Context, slug string) (*model.Product, error) {
+	logger := logrus.WithFields(logrus.Fields{
+		"context": utils.DumpIncomingContext(ctx),
+		"slug":    slug})
+
+	cacheKey := p.newCacheKeyBySlug(slug)
+	if !config.DisableCaching() {
+		reply, err := findFromCacheByKey[int64](p.cache, cacheKey)
+
+		if err != nil {
+			logger.Error(err)
+			return nil, err
+		}
+		if reply > 0 {
+			return p.FindByID(ctx, reply)
+		}
+	}
+
+	var product *model.Product
+	var id int64
+	var ids []int64
+	err := p.db.WithContext(ctx).Model(product).Where("slug = ?", slug).Pluck("id", &ids).Error
+	if err != nil {
+		logger.Error(err)
+		return nil, err
+	}
+
+	if len(ids) == 0 {
+		storeNilCacheByKey(p.cache, cacheKey)
+		return nil, nil
+	}
+
+	id = ids[0]
+
+	err = p.cache.Store(cache.NewItem(cacheKey, id))
+	if err != nil {
+		logger.Error(err)
+	}
+
+	return p.FindByID(ctx, id)
+}
+
 func (p *productRepository) Create(ctx context.Context, product *model.Product) error {
 	logger := logrus.WithFields(logrus.Fields{
 		"ctx":     utils.DumpIncomingContext(ctx),
@@ -177,6 +220,10 @@ func (p *productRepository) countAll(ctx context.Context, criteria model.Product
 
 func (p *productRepository) newCacheKeyByID(id int64) string {
 	return fmt.Sprintf("cache:object:product:id:%d", id)
+}
+
+func (p *productRepository) newCacheKeyBySlug(slug string) string {
+	return fmt.Sprintf("cache:object:product:slug:%s", slug)
 }
 
 func (p *productRepository) newProductCacheKeyBucket() string {

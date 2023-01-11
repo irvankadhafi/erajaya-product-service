@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"context"
+	"errors"
 	"github.com/agiledragon/gomonkey/v2"
 	"github.com/golang/mock/gomock"
 	"github.com/irvankadhafi/erajaya-product-service/internal/model"
@@ -40,6 +41,14 @@ func TestProductUsecase_FindByID(t *testing.T) {
 		require.EqualError(t, err, ErrNotFound.Error())
 		require.Nil(t, res)
 	})
+
+	t.Run("system error", func(t *testing.T) {
+		mockRepo.EXPECT().FindByID(ctx, id).Times(1).Return(nil, errors.New("some repo error"))
+		res, err := usecase.FindByID(ctx, id)
+		require.Error(t, err)
+		require.NotEqual(t, err, ErrNotFound)
+		require.Nil(t, res)
+	})
 }
 
 func TestProductUsecase_Create(t *testing.T) {
@@ -62,6 +71,7 @@ func TestProductUsecase_Create(t *testing.T) {
 	}
 
 	t.Run("ok", func(t *testing.T) {
+		mockRepo.EXPECT().FindBySlug(ctx, product.Slug).Times(1).Return(nil, nil)
 		mockRepo.EXPECT().Create(ctx, gomock.Any()).Times(1).Return(nil)
 		mockRepo.EXPECT().FindByID(ctx, gomock.Any()).Times(1).Return(product, nil)
 
@@ -69,9 +79,38 @@ func TestProductUsecase_Create(t *testing.T) {
 			Name:        product.Name,
 			Description: product.Description,
 			Quantity:    product.Quantity,
+			Price:       product.Price,
 		})
 		require.NoError(t, err)
 		require.NotNil(t, product)
+	})
+
+	t.Run("failed, product with same name already exist", func(t *testing.T) {
+		mockRepo.EXPECT().FindBySlug(ctx, product.Slug).Times(1).Return(nil, ErrAlreadyExist)
+
+		product, err := usecase.Create(ctx, model.CreateProductInput{
+			Name:        product.Name,
+			Description: product.Description,
+			Quantity:    product.Quantity,
+			Price:       product.Price,
+		})
+		require.Error(t, err)
+		require.Nil(t, product)
+	})
+
+	t.Run("failed insert", func(t *testing.T) {
+		mockRepo.EXPECT().FindBySlug(ctx, product.Slug).Times(1).Return(nil, nil)
+		mockRepo.EXPECT().Create(ctx, gomock.Any()).Times(1).Return(errors.New("db error"))
+
+		product, err := usecase.Create(ctx, model.CreateProductInput{
+			Name:        product.Name,
+			Description: product.Description,
+			Quantity:    product.Quantity,
+			Price:       product.Price,
+		})
+
+		require.Error(t, err)
+		require.Nil(t, product)
 	})
 }
 

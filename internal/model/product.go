@@ -21,7 +21,7 @@ type Product struct {
 type ProductRepository interface {
 	FindByID(ctx context.Context, id int64) (*Product, error)
 	SearchByPage(ctx context.Context, criteria ProductSearchCriteria) (ids []int64, count int64, err error)
-
+	FindBySlug(ctx context.Context, slug string) (*Product, error)
 	Create(ctx context.Context, product *Product) error
 }
 

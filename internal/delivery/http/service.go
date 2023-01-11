@@ -27,15 +27,3 @@ func (s *Service) initRoutes() {
 	s.echo.GET("/products/", s.handleGetAllProducts())
 	s.echo.POST("/products/", s.handleCreateProduct())
 }
-
-type successResponse struct {
-	Success bool `json:"success"`
-	Data    any  `json:"data"`
-}
-
-func setSuccessResponse(data any) successResponse {
-	return successResponse{
-		Success: true,
-		Data:    data,
-	}
-}

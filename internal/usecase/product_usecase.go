@@ -109,6 +109,15 @@ func (p *productUsecase) Create(ctx context.Context, input model.CreateProductIn
 		Quantity:    input.Quantity,
 	}
 
+	existingProduct, err := p.productRepo.FindBySlug(ctx, product.Slug)
+	if err != nil && err != ErrNotFound {
+		logger.Error(err)
+		return nil, err
+	}
+	if existingProduct != nil {
+		return nil, ErrAlreadyExist
+	}
+
 	err = p.productRepo.Create(ctx, product)
 	if err != nil {
 		logger.Error(err)

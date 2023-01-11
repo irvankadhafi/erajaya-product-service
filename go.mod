@@ -7,6 +7,7 @@ require (
 	github.com/agiledragon/gomonkey/v2 v2.9.0
 	github.com/alicebob/miniredis v2.5.0+incompatible
 	github.com/banzaicloud/logrus-runtime-formatter v0.0.0-20190729070250-5ae5475bae5e
+	github.com/dustin/go-humanize v1.0.0
 	github.com/go-playground/validator v9.31.0+incompatible
 	github.com/go-redis/redis/v8 v8.11.5
 	github.com/golang/mock v1.6.0
