@@ -116,7 +116,7 @@ func DatabaseConnMaxLifetime() time.Duration {
 
 // DisableCaching :nodoc:
 func DisableCaching() bool {
-	return viper.GetBool("disable_caching")
+	return viper.GetBool("redis.disable_caching")
 }
 
 // RedisHost :nodoc:
