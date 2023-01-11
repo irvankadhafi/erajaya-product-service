@@ -67,18 +67,18 @@ func (s *Service) handleCreateProduct() echo.HandlerFunc {
 }
 
 func (s *Service) handleGetAllProducts() echo.HandlerFunc {
-	type MetaInfo struct {
-		Size       int  `json:"size"`
-		Count      int  `json:"count"`
-		CountPage  int  `json:"countPage"`
-		HasMore    bool `json:"hasMore"`
-		Cursor     int  `json:"cursor"`
-		NextCursor int  `json:"nextCursor"`
+	type metaInfo struct {
+		Size      int  `json:"size"`
+		Count     int  `json:"count"`
+		CountPage int  `json:"count_page"`
+		HasMore   bool `json:"has_more"`
+		Page      int  `json:"page"`
+		NextPage  int  `json:"next_page"`
 	}
 
 	type userCursor struct {
 		Items    []*model.Product `json:"items"`
-		MetaInfo *MetaInfo        `json:"meta_info"`
+		MetaInfo *metaInfo        `json:"meta_info"`
 	}
 	return func(c echo.Context) error {
 		ctx := c.Request().Context()
@@ -104,36 +104,27 @@ func (s *Service) handleGetAllProducts() echo.HandlerFunc {
 			return ErrInternal
 		}
 
-		//var userResponses []userResponse
-		//for _, user := range users {
-		//	userResponses = append(userResponses, userResponse{
-		//		ID:          utils.Int64ToString(user.ID),
-		//		Name:        user.Name,
-		//		Email:       user.Email,
-		//		RoleID:      user.RoleID,
-		//		PhoneNumber: user.PhoneNumber,
-		//		CreatedAt:   utils.FormatTimeRFC3339(&user.CreatedAt),
-		//		UpdatedAt:   utils.FormatTimeRFC3339(&user.UpdatedAt),
-		//	})
-		//}
 		hasMore := int(count)-(criterias.Page*criterias.Size) > 0
 		countPage := math.Ceil(float64(count) / float64(criterias.Size))
 		res := userCursor{
 			Items: items,
-			MetaInfo: &MetaInfo{
+			MetaInfo: &metaInfo{
 				Size:      size,
 				Count:     int(count),
 				CountPage: int(countPage),
 				HasMore:   hasMore,
-				Cursor:    page,
+				Page:      page,
 			},
 		}
 		if !hasMore {
-			res.MetaInfo.NextCursor = 0
+			res.MetaInfo.NextPage = 0
 		} else {
-			res.MetaInfo.NextCursor = page + 1
+			res.MetaInfo.NextPage = page + 1
 		}
 
-		return c.JSON(http.StatusOK, res)
+		return c.JSON(http.StatusOK, successResponse{
+			Success: true,
+			Data:    res,
+		})
 	}
 }
