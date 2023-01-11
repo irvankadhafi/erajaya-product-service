@@ -2,7 +2,6 @@ package repository
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"github.com/irvankadhafi/erajaya-product-service/cache"
 	"github.com/irvankadhafi/erajaya-product-service/internal/config"
@@ -10,6 +9,7 @@ import (
 	"github.com/irvankadhafi/erajaya-product-service/utils"
 	"github.com/sirupsen/logrus"
 	"gorm.io/gorm"
+	"time"
 )
 
 type productRepository struct {
@@ -33,7 +33,7 @@ func (p *productRepository) FindByID(ctx context.Context, id int64) (*model.Prod
 
 	cacheKey := p.newCacheKeyByID(id)
 	if !config.DisableCaching() {
-		reply, err := p.findFromCacheByKey(cacheKey)
+		reply, err := findFromCacheByKey[*model.Product](p.cache, cacheKey)
 		if err != nil {
 			logger.Error(err)
 			return nil, err
@@ -53,7 +53,7 @@ func (p *productRepository) FindByID(ctx context.Context, id int64) (*model.Prod
 		}
 		return product, nil
 	case gorm.ErrRecordNotFound:
-		p.storeNilCacheByKey(cacheKey)
+		storeNilCacheByKey(p.cache, cacheKey)
 		return nil, nil
 	default:
 		logger.Error(err)
@@ -73,38 +73,53 @@ func (p *productRepository) Create(ctx context.Context, product *model.Product) 
 		return err
 	}
 
-	err = p.cache.DeleteByKeys([]string{p.newCacheKeyByID(product.ID)})
-	if err != nil {
+	if err = p.deleteCaches(product.ID); err != nil {
 		logger.Error(err)
 	}
 	return nil
 }
 
-func (p *productRepository) SearchByPage(ctx context.Context, criteria model.ProductCriteria) (ids []int64, count int64, err error) {
+func (p *productRepository) SearchByPage(ctx context.Context, criteria model.ProductSearchCriteria) (ids []int64, count int64, err error) {
 	logger := logrus.WithFields(logrus.Fields{
 		"ctx":      utils.DumpIncomingContext(ctx),
 		"criteria": utils.Dump(criteria),
 	})
 
-	err = p.db.WithContext(ctx).Model(model.Product{}).
-		Count(&count).
-		Error
+	cacheKey := p.newProductCacheKeyByCriteria(criteria)
+	if !config.DisableCaching() {
+		products, err := findFromCacheByKey[*model.MultiCacheValue](p.cache, cacheKey)
+		if err != nil {
+			logger.Error(err)
+			return nil, 0, err
+		}
+
+		if products != nil {
+			return products.IDs, products.Count, nil
+		}
+	}
+
+	count, err = p.countAll(ctx, criteria)
 	if err != nil {
 		logger.Error(err)
 		return nil, 0, err
 	}
 
 	if count <= 0 {
+		storeNilMultiValueByKey(p.cache, cacheKey)
 		return nil, 0, nil
 	}
 
-	err = p.db.Debug().WithContext(ctx).
-		Model(model.Product{}).
-		Scopes(scopeByPageAndLimit(criteria.Page, criteria.Size)).
-		Order(orderByProductSortType(criteria.SortType)).
-		Pluck("id", &ids).Error
+	ids, err = p.findAllIDsByCriteria(ctx, criteria)
 	switch err {
 	case nil:
+		cacheItem := cache.NewItemWithCustomTTL(
+			cacheKey,
+			utils.Dump(model.MultiCacheValue{IDs: ids, Count: count}),
+			15*time.Second,
+		)
+		if err := p.cache.Store(cacheItem); err != nil {
+			logger.Error(err)
+		}
 		return ids, count, nil
 	case gorm.ErrRecordNotFound:
 		return nil, 0, nil
@@ -114,34 +129,83 @@ func (p *productRepository) SearchByPage(ctx context.Context, criteria model.Pro
 	}
 }
 
+func (p *productRepository) findAllIDsByCriteria(ctx context.Context, criteria model.ProductSearchCriteria) ([]int64, error) {
+	var scopes []func(*gorm.DB) *gorm.DB
+	scopes = append(scopes, scopeByPageAndLimit(criteria.Page, criteria.Size))
+	if criteria.Query != "" {
+		scopes = append(scopes, scopeMatchTSQuery(criteria.Query))
+	}
+
+	var ids []int64
+	err := p.db.WithContext(ctx).
+		Model(model.Product{}).
+		Scopes(scopes...).
+		Order(orderByProductSortType(criteria.SortType)).
+		Pluck("id", &ids).Error
+	if err != nil {
+		logrus.WithFields(logrus.Fields{
+			"ctx":      utils.DumpIncomingContext(ctx),
+			"criteria": utils.Dump(criteria),
+		}).Error(err)
+		return nil, err
+	}
+
+	return ids, nil
+}
+
+func (p *productRepository) countAll(ctx context.Context, criteria model.ProductSearchCriteria) (int64, error) {
+	var scopes []func(*gorm.DB) *gorm.DB
+	if criteria.Query != "" {
+		scopes = append(scopes, scopeMatchTSQuery(criteria.Query))
+	}
+
+	var count int64
+	err := p.db.WithContext(ctx).Model(model.Product{}).
+		Scopes(scopes...).
+		Count(&count).
+		Error
+	if err != nil {
+		logrus.WithFields(logrus.Fields{
+			"ctx":      utils.DumpIncomingContext(ctx),
+			"criteria": utils.Dump(criteria),
+		}).Error(err)
+		return 0, err
+	}
+
+	return count, nil
+}
+
 func (p *productRepository) newCacheKeyByID(id int64) string {
 	return fmt.Sprintf("cache:object:product:id:%d", id)
 }
 
-func (p *productRepository) findFromCacheByKey(key string) (reply *model.Product, err error) {
-	var rep interface{}
-	rep, err = p.cache.Get(key)
-	if err != nil || rep == nil {
-		return
-	}
-
-	bt, _ := rep.([]byte)
-	if bt == nil {
-		return
-	}
-
-	if err = json.Unmarshal(bt, &reply); err != nil {
-		return
-	}
-
-	return
+func (p *productRepository) newProductCacheKeyBucket() string {
+	return fmt.Sprintf("cache:object:product")
 }
 
-func (p *productRepository) storeNilCacheByKey(key string) {
-	err := p.cache.StoreNil(key)
-	if err != nil {
-		logrus.Error(err)
+func (p *productRepository) newProductCacheKeyByCriteria(criteria model.ProductSearchCriteria) string {
+	key := fmt.Sprintf("cache:object:productMultiValue:page:%d:size:%d:sortType:%s", criteria.Page, criteria.Size, string(criteria.SortType))
+
+	if criteria.Query != "" {
+		return key + ":query:" + criteria.Query
 	}
+
+	return key
+}
+
+func (p *productRepository) deleteCaches(productID int64) error {
+	productCacheKeyBucket := p.newProductCacheKeyBucket()
+	productCacheKey := p.newCacheKeyByID(productID)
+
+	err := p.cache.DeleteByKeys([]string{
+		productCacheKeyBucket,
+		productCacheKey,
+	})
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func orderByProductSortType(sortType model.ProductSortType) string {

@@ -125,7 +125,7 @@ func TestProductUsecase_Search(t *testing.T) {
 		productRepo: mockRepo,
 	}
 
-	testSearchCriteria := model.ProductCriteria{
+	testSearchCriteria := model.ProductSearchCriteria{
 		Page:     1,
 		Size:     2,
 		SortType: model.ProductSortTypeCreatedAtAsc,

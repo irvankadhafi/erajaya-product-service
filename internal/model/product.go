@@ -20,7 +20,7 @@ type Product struct {
 // ProductRepository repository
 type ProductRepository interface {
 	FindByID(ctx context.Context, id int64) (*Product, error)
-	SearchByPage(ctx context.Context, criteria ProductCriteria) (ids []int64, count int64, err error)
+	SearchByPage(ctx context.Context, criteria ProductSearchCriteria) (ids []int64, count int64, err error)
 
 	Create(ctx context.Context, product *Product) error
 }
@@ -29,7 +29,7 @@ type ProductRepository interface {
 type ProductUsecase interface {
 	FindByID(ctx context.Context, id int64) (*Product, error)
 	FindAllByIDs(ctx context.Context, ids []int64) (products []*Product)
-	Search(ctx context.Context, criteria ProductCriteria) (products []*Product, count int64, err error)
+	Search(ctx context.Context, criteria ProductSearchCriteria) (products []*Product, count int64, err error)
 
 	Create(ctx context.Context, input CreateProductInput) (*Product, error)
 }
@@ -59,19 +59,18 @@ const (
 	ProductSortTypeNameDesc      ProductSortType = "NAME_DESC"
 )
 
-var (
-	// QueryProductSortByMap sort type to query string map for database ordering
-	QueryProductSortByMap = map[ProductSortType]string{
-		ProductSortTypeCreatedAtAsc:  "created_at ASC",
-		ProductSortTypeCreatedAtDesc: "created_at DESC",
-		ProductSortTypePriceAsc:      "price ASC",
-		ProductSortTypePriceDesc:     "price DESC",
-		ProductSortTypeNameAsc:       "name ASC",
-		ProductSortTypeNameDesc:      "name DESC",
-	}
-)
+// QueryProductSortByMap sort type to query string map for database ordering
+var QueryProductSortByMap = map[ProductSortType]string{
+	ProductSortTypeCreatedAtAsc:  "created_at ASC",
+	ProductSortTypeCreatedAtDesc: "created_at DESC",
+	ProductSortTypePriceAsc:      "price ASC",
+	ProductSortTypePriceDesc:     "price DESC",
+	ProductSortTypeNameAsc:       "name ASC",
+	ProductSortTypeNameDesc:      "name DESC",
+}
 
-type ProductCriteria struct {
+type ProductSearchCriteria struct {
+	Query    string          `json:"query"`
 	Page     int             `json:"page"`
 	Size     int             `json:"size"`
 	SortType ProductSortType `json:"sort_type"`

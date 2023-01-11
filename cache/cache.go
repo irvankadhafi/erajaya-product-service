@@ -72,7 +72,7 @@ func (c *cache) DeleteByKeys(keys []string) error {
 		redisKeys = append(redisKeys, key)
 	}
 
-	_, err := client.Do("DEL", redisKeys...)
+	_, err := client.Do("UNLINK", redisKeys...)
 	return err
 }
 

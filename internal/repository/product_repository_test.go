@@ -144,18 +144,20 @@ func TestProductRepository_SearchByPage(t *testing.T) {
 
 	ctx := context.TODO()
 	repo := &productRepository{
-		db: kit.db,
+		db:    kit.db,
+		cache: kit.cache,
 	}
 
 	productIDs := []int64{int64(111), int64(222), int64(333), int64(444)}
 	expectedCount := int64(len(productIDs))
-	criteria := model.ProductCriteria{
+	criteria := model.ProductSearchCriteria{
 		Page:     1,
 		Size:     10,
 		SortType: model.ProductSortTypeNameDesc,
 	}
 
 	t.Run("success", func(t *testing.T) {
+		defer kit.miniredis.FlushAll()
 		mock.ExpectQuery(`^SELECT count(.*) FROM "products"`).
 			WillReturnRows(sqlmock.NewRows([]string{"count"}).AddRow(len(productIDs)))
 
@@ -165,6 +167,23 @@ func TestProductRepository_SearchByPage(t *testing.T) {
 		}
 		mock.ExpectQuery(`^SELECT .+ FROM "products"`).
 			WillReturnRows(rows)
+
+		actualProductIDs, count, err := repo.SearchByPage(ctx, criteria)
+		require.NoError(t, err)
+		require.Equal(t, len(productIDs), len(actualProductIDs))
+		require.Equal(t, expectedCount, count)
+	})
+
+	t.Run("success, from cache", func(t *testing.T) {
+		defer kit.miniredis.FlushAll()
+		multiValue := &model.MultiCacheValue{
+			IDs:   productIDs,
+			Count: expectedCount,
+		}
+
+		cacheKey := repo.newProductCacheKeyByCriteria(criteria)
+		err := kit.miniredis.Set(cacheKey, utils.Dump(multiValue))
+		require.NoError(t, err)
 
 		actualProductIDs, count, err := repo.SearchByPage(ctx, criteria)
 		require.NoError(t, err)

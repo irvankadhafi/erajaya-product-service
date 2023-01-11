@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"google.golang.org/grpc/metadata"
+	"math"
 	"math/rand"
 	"strconv"
 	"time"
@@ -40,10 +41,18 @@ func Offset(page, limit int) int {
 	return offset
 }
 
+// StringToInt convert string to int
 func StringToInt(s string) int {
 	i, err := strconv.Atoi(s)
 	if err != nil {
 		return 0
 	}
 	return i
+}
+
+// CalculatePages function that takes in the total number of items and the number of items per page,
+// and calculates the number of pages required to fit all the items.
+// it returns the number of pages as an integer
+func CalculatePages(total, size int) int {
+	return int(math.Ceil(float64(total) / float64(size)))
 }

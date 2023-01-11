@@ -5,7 +5,6 @@ import (
 	"github.com/irvankadhafi/erajaya-product-service/utils"
 	"github.com/labstack/echo/v4"
 	"github.com/sirupsen/logrus"
-	"math"
 	"net/http"
 )
 
@@ -37,12 +36,11 @@ func (s *Service) handleCreateProduct() echo.HandlerFunc {
 
 func (s *Service) handleGetAllProducts() echo.HandlerFunc {
 	type metaInfo struct {
-		Size      int  `json:"size"`
-		Count     int  `json:"count"`
-		CountPage int  `json:"count_page"`
-		HasMore   bool `json:"has_more"`
-		Page      int  `json:"page"`
-		NextPage  int  `json:"next_page"`
+		Size      int `json:"size"`
+		Count     int `json:"count"`
+		CountPage int `json:"count_page"`
+		Page      int `json:"page"`
+		NextPage  int `json:"next_page"`
 	}
 
 	type userCursor struct {
@@ -58,10 +56,12 @@ func (s *Service) handleGetAllProducts() echo.HandlerFunc {
 		page := utils.StringToInt(c.QueryParam("page"))
 		size := utils.StringToInt(c.QueryParam("size"))
 		sortType := c.QueryParam("sortBy")
-		criterias := model.ProductCriteria{
+		query := c.QueryParam("query")
+		criterias := model.ProductSearchCriteria{
 			Page:     page,
 			Size:     size,
 			SortType: model.ProductSortType(sortType),
+			Query:    query,
 		}
 
 		items, count, err := s.productUsecase.Search(ctx, criterias)
@@ -74,14 +74,12 @@ func (s *Service) handleGetAllProducts() echo.HandlerFunc {
 		}
 
 		hasMore := int(count)-(criterias.Page*criterias.Size) > 0
-		countPage := math.Ceil(float64(count) / float64(criterias.Size))
 		res := userCursor{
 			Items: items,
 			MetaInfo: &metaInfo{
 				Size:      size,
 				Count:     int(count),
-				CountPage: int(countPage),
-				HasMore:   hasMore,
+				CountPage: utils.CalculatePages(int(count), criterias.Size),
 				Page:      page,
 			},
 		}
