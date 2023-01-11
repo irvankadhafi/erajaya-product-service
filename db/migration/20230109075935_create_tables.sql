@@ -3,7 +3,7 @@ CREATE TABLE IF NOT EXISTS "products" (
     "id" BIGINT PRIMARY KEY,
     "name" TEXT,
     "slug" TEXT,
-    "price" DECIMAL(10,2),
+    "price" DECIMAL(20,0),
     "description" TEXT,
     "quantity" INT,
     "created_at" TIMESTAMP NOT NULL DEFAULT 'NOW()',

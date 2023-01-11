@@ -27,7 +27,12 @@ func RouteService(
 }
 
 func (s *Service) initRoutes() {
-	s.echo.POST("/products", s.handleCreateProduct())
+	s.echo.POST("/products/", s.handleCreateProduct())
+}
+
+type successResponse struct {
+	Success bool `json:"success"`
+	Data    any  `json:"data"`
 }
 
 func (s *Service) handleCreateProduct() echo.HandlerFunc {
@@ -36,13 +41,14 @@ func (s *Service) handleCreateProduct() echo.HandlerFunc {
 		logger := logrus.WithFields(logrus.Fields{
 			"ctx": utils.DumpIncomingContext(ctx),
 		})
-
+		logger.Warn("MASUK")
 		req := model.CreateProductInput{}
 		if err := c.Bind(&req); err != nil {
 			logrus.Error(err)
 			return ErrInvalidArgument
 		}
 
+		logger.Warn("PRICE>>>>>>", req.Price)
 		product, err := s.productUsecase.Create(ctx, req)
 		switch err {
 		case nil:
@@ -52,6 +58,9 @@ func (s *Service) handleCreateProduct() echo.HandlerFunc {
 			return ErrInternal
 		}
 
-		return c.JSON(http.StatusCreated, product)
+		return c.JSON(http.StatusCreated, successResponse{
+			Success: true,
+			Data:    product,
+		})
 	}
 }

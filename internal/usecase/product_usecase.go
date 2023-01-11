@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"context"
+	"github.com/gosimple/slug"
 	"github.com/irvankadhafi/erajaya-product-service/internal/model"
 	"github.com/irvankadhafi/erajaya-product-service/utils"
 	"github.com/sirupsen/logrus"
@@ -97,18 +98,20 @@ func (p *productUsecase) Create(ctx context.Context, input model.CreateProductIn
 	}
 
 	product := &model.Product{
-		ID:   utils.GenerateID(),
-		Name: input.Name,
-		//Slug:        input.,
+		ID:          utils.GenerateID(),
+		Name:        input.Name,
+		Slug:        slug.Make(input.Name),
+		Price:       input.Price,
 		Description: input.Description,
 		Quantity:    input.Quantity,
 	}
+	logrus.Warn("WOW: ", utils.Dump(product))
 	err = p.productRepo.Create(ctx, product)
 	if err != nil {
 		logger.Error(err)
 		return nil, err
 	}
-
+	logrus.Warn("WOW2: ", product.ID)
 	return p.FindByID(ctx, product.ID)
 }
 

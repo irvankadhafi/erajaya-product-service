@@ -2,6 +2,10 @@ package repository
 
 import (
 	"context"
+	"encoding/json"
+	"fmt"
+	"github.com/irvankadhafi/erajaya-product-service/cache"
+	"github.com/irvankadhafi/erajaya-product-service/internal/config"
 	"github.com/irvankadhafi/erajaya-product-service/internal/model"
 	"github.com/irvankadhafi/erajaya-product-service/utils"
 	"github.com/sirupsen/logrus"
@@ -9,13 +13,15 @@ import (
 )
 
 type productRepository struct {
-	db *gorm.DB
+	db    *gorm.DB
+	cache cache.Cache
 }
 
 // NewProductRepository create new repository
-func NewProductRepository(db *gorm.DB) model.ProductRepository {
+func NewProductRepository(db *gorm.DB, cache cache.Cache) model.ProductRepository {
 	return &productRepository{
-		db: db,
+		db:    db,
+		cache: cache,
 	}
 }
 
@@ -25,12 +31,30 @@ func (p *productRepository) FindByID(ctx context.Context, id int64) (*model.Prod
 		"productID": id,
 	})
 
-	var product model.Product
-	err := p.db.Debug().WithContext(ctx).Take(&product, "id = ?", id).Error
+	cacheKey := p.newCacheKeyByID(id)
+	if !config.DisableCaching() {
+		reply, err := p.findFromCacheByKey(cacheKey)
+		if err != nil {
+			logger.Error(err)
+			return nil, err
+		}
+
+		if reply != nil {
+			return reply, nil
+		}
+	}
+
+	product := &model.Product{}
+	err := p.db.WithContext(ctx).Take(product, "id = ?", id).Error
 	switch err {
 	case nil:
-		return &product, nil
+		err := p.cache.Store(cache.NewItem(cacheKey, utils.Dump(product)))
+		if err != nil {
+			logger.Error(err)
+		}
+		return product, nil
 	case gorm.ErrRecordNotFound:
+		p.storeNilCacheByKey(cacheKey)
 		return nil, nil
 	default:
 		logger.Error(err)
@@ -50,6 +74,10 @@ func (p *productRepository) Create(ctx context.Context, product *model.Product) 
 		return err
 	}
 
+	err = p.cache.DeleteByKeys([]string{p.newCacheKeyByID(product.ID)})
+	if err != nil {
+		logger.Error(err)
+	}
 	return nil
 }
 
@@ -84,6 +112,36 @@ func (p *productRepository) SearchByPage(ctx context.Context, criteria model.Pro
 	default:
 		logger.Error(err)
 		return nil, 0, err
+	}
+}
+
+func (p *productRepository) newCacheKeyByID(id int64) string {
+	return fmt.Sprintf("cache:object:product:id:%d", id)
+}
+
+func (p *productRepository) findFromCacheByKey(key string) (reply *model.Product, err error) {
+	var rep interface{}
+	rep, err = p.cache.Get(key)
+	if err != nil || rep == nil {
+		return
+	}
+
+	bt, _ := rep.([]byte)
+	if bt == nil {
+		return
+	}
+
+	if err = json.Unmarshal(bt, &reply); err != nil {
+		return
+	}
+
+	return
+}
+
+func (p *productRepository) storeNilCacheByKey(key string) {
+	err := p.cache.StoreNil(key)
+	if err != nil {
+		logrus.Error(err)
 	}
 }
 

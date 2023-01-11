@@ -2,20 +2,19 @@ package model
 
 import (
 	"context"
-	"github.com/shopspring/decimal"
 	"time"
 )
 
 // Product :nodoc:
 type Product struct {
-	ID          int64           `json:"id" gorm:"primary_key"`
-	Name        string          `json:"name"`
-	Slug        string          `json:"slug"`
-	Description string          `json:"description"`
-	Price       decimal.Decimal `json:"price" sql:"type:decimal(10,2)"`
-	Quantity    int             `json:"quantity"`
-	CreatedAt   time.Time       `json:"created_at" sql:"DEFAULT:'now()':::STRING::TIMESTAMP" gorm:"->;<-:create"` // create & read only
-	UpdatedAt   time.Time       `json:"updated_at" sql:"DEFAULT:'now()':::STRING::TIMESTAMP"`
+	ID          int64     `json:"id" gorm:"primary_key"`
+	Name        string    `json:"name"`
+	Slug        string    `json:"slug"`
+	Description string    `json:"description"`
+	Price       int64     `json:"price" sql:"type:decimal(20,0)" gorm:"type:numeric(20,0)"`
+	Quantity    int       `json:"quantity"`
+	CreatedAt   time.Time `json:"created_at" sql:"DEFAULT:'now()':::STRING::TIMESTAMP" gorm:"->;<-:create"` // create & read only
+	UpdatedAt   time.Time `json:"updated_at" sql:"DEFAULT:'now()':::STRING::TIMESTAMP"`
 }
 
 // ProductUsecase :nodoc:
@@ -38,6 +37,7 @@ type ProductRepository interface {
 type CreateProductInput struct {
 	Name        string `json:"name" validate:"required,min=3,max=60"`
 	Description string `json:"description" validate:"max=80"`
+	Price       int64  `json:"price"`
 	Quantity    int    `json:"quantity"`
 }
 
