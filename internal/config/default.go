@@ -8,4 +8,6 @@ const (
 	DefaultDatabaseConnMaxLifetime = 1 * time.Hour
 	DefaultDatabasePingInterval    = 1 * time.Second
 	DefaultDatabaseRetryAttempts   = 3
+
+	DefaultRedisCacheTTL = 15 * time.Minute
 )

@@ -3,6 +3,7 @@ package console
 import (
 	"context"
 	"fmt"
+	"github.com/irvankadhafi/erajaya-product-service/cache"
 	"github.com/irvankadhafi/erajaya-product-service/internal/config"
 	"github.com/irvankadhafi/erajaya-product-service/internal/db"
 	"github.com/irvankadhafi/erajaya-product-service/internal/delivery/httpsvc"
@@ -34,12 +35,20 @@ func init() {
 func runServer(cmd *cobra.Command, args []string) {
 	// Initiate all connection like db, redis, etc
 	db.InitializePostgresConn()
-
 	pgDB, err := db.PostgreSQL.DB()
 	continueOrFatal(err)
 	defer helper.WrapCloser(pgDB.Close)
 
-	productRepository := repository.NewProductRepository(db.PostgreSQL)
+	cacheManager := cache.NewCache()
+
+	redisConn, err := db.NewRedisConnPool(config.RedisHost())
+	continueOrFatal(err)
+	defer helper.WrapCloser(redisConn.Close)
+
+	cacheManager.SetConnectionPool(redisConn)
+	cacheManager.SetDefaultTTL(config.RedisCacheTTL())
+
+	productRepository := repository.NewProductRepository(db.PostgreSQL, cacheManager)
 	productUsecase := usecase.NewProductUsecase(productRepository)
 
 	httpServer := echo.New()

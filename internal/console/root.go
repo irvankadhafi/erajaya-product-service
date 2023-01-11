@@ -1,6 +1,7 @@
 package console
 
 import (
+	"github.com/irvankadhafi/erajaya-product-service/internal/config"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"os"
@@ -12,6 +13,10 @@ var RootCmd = &cobra.Command{
 	Short: "An example of cobra",
 	Long: `This application shows how to create modern CLI
 			applications in go using Cobra CLI library`,
+}
+
+func init() {
+	config.GetConf()
 }
 
 // Execute runs the root command for the application and handles any errors that may occur during execution.

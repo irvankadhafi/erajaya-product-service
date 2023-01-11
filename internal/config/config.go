@@ -113,3 +113,61 @@ func DatabaseConnMaxLifetime() time.Duration {
 	}
 	return time.Duration(viper.GetInt("postgres.conn_max_lifetime")) * time.Millisecond
 }
+
+// DisableCaching :nodoc:
+func DisableCaching() bool {
+	return viper.GetBool("disable_caching")
+}
+
+// RedisHost :nodoc:
+func RedisHost() string {
+	return viper.GetString("redis.host")
+}
+
+// RedisDialTimeout :nodoc:
+func RedisDialTimeout() time.Duration {
+	cfg := viper.GetString("redis.dial_timeout")
+	return parseDuration(cfg, 5*time.Second)
+}
+
+// RedisWriteTimeout :nodoc:
+func RedisWriteTimeout() time.Duration {
+	cfg := viper.GetString("redis.write_timeout")
+	return parseDuration(cfg, 2*time.Second)
+}
+
+// RedisReadTimeout :nodoc:
+func RedisReadTimeout() time.Duration {
+	cfg := viper.GetString("redis.read_timeout")
+	return parseDuration(cfg, 2*time.Second)
+}
+
+// RedisMaxIdleConn :nodoc:
+func RedisMaxIdleConn() int {
+	if viper.GetInt("redis.max_idle_conn") > 0 {
+		return viper.GetInt("redis.max_idle_conn")
+	}
+	return 20
+}
+
+// RedisMaxActiveConn :nodoc:
+func RedisMaxActiveConn() int {
+	if viper.GetInt("redis.max_active_conn") > 0 {
+		return viper.GetInt("redis.max_active_conn")
+	}
+	return 50
+}
+
+// RedisCacheTTL :nodoc:
+func RedisCacheTTL() time.Duration {
+	cfg := viper.GetString("cache_ttl")
+	return parseDuration(cfg, DefaultRedisCacheTTL)
+}
+
+func parseDuration(in string, defaultDuration time.Duration) time.Duration {
+	dur, err := time.ParseDuration(in)
+	if err != nil {
+		return defaultDuration
+	}
+	return dur
+}
