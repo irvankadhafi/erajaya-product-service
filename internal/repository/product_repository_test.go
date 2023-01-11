@@ -6,6 +6,7 @@ import (
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/irvankadhafi/erajaya-product-service/internal/model"
 	"github.com/irvankadhafi/erajaya-product-service/utils"
+	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/require"
 	"gorm.io/gorm"
 	"testing"
@@ -26,6 +27,7 @@ func TestProductRepository_Create(t *testing.T) {
 		ID:          utils.GenerateID(),
 		Name:        "Apple iPhone 14 Pro Max",
 		Slug:        "apple-iphone-14-pro-max",
+		Price:       decimal.New(19000000, 0),
 		Description: "Apple iPhone 14 Pro Max",
 		Quantity:    20,
 	}
@@ -35,10 +37,16 @@ func TestProductRepository_Create(t *testing.T) {
 			"id",
 			"name",
 			"slug",
+			"price",
 			"description",
 			"quantity",
 		})
-		rows.AddRow(product.ID, product.Name, product.Slug, product.Description, product.Quantity)
+		rows.AddRow(product.ID,
+			product.Name,
+			product.Slug,
+			product.Price,
+			product.Description,
+			product.Quantity)
 
 		mock.ExpectBegin()
 		mock.ExpectQuery(`^INSERT INTO "products"`).WillReturnRows(rows)
@@ -73,6 +81,7 @@ func TestProductRepository_FindByID(t *testing.T) {
 		ID:          utils.GenerateID(),
 		Name:        "Apple iPhone 14 Pro Max",
 		Slug:        "apple-iphone-14-pro-max",
+		Price:       decimal.New(19000000, 0),
 		Description: "Apple iPhone 14 Pro Max",
 		Quantity:    20,
 	}
@@ -82,10 +91,16 @@ func TestProductRepository_FindByID(t *testing.T) {
 			"id",
 			"name",
 			"slug",
+			"price",
 			"description",
 			"quantity",
 		})
-		rows.AddRow(product.ID, product.Name, product.Slug, product.Description, product.Quantity)
+		rows.AddRow(product.ID,
+			product.Name,
+			product.Slug,
+			product.Price,
+			product.Description,
+			product.Quantity)
 
 		mock.ExpectQuery("^SELECT .+ FROM \"products\"").WillReturnRows(rows)
 

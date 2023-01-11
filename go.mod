@@ -4,6 +4,7 @@ go 1.18
 
 require (
 	github.com/DATA-DOG/go-sqlmock v1.5.0
+	github.com/agiledragon/gomonkey/v2 v2.9.0
 	github.com/banzaicloud/logrus-runtime-formatter v0.0.0-20190729070250-5ae5475bae5e
 	github.com/go-playground/validator v9.31.0+incompatible
 	github.com/golang/mock v1.6.0
