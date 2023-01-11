@@ -50,3 +50,11 @@ Tiap komponen tidak bergantung pada framework ataupun database yang digunakan (i
 |   # file Makefile dipergunakan oleh command `make`.
 └── ...
 ```
+
+## List API
+Berikut fitur dan endpoint API yang terdapat dalam project ini :
+
+| Method | Feature        | Endpoint   |
+|--------|----------------|------------|
+| POST   | Create product | /products/ |
+| GET    | Search product | /products/ |
