@@ -4,10 +4,9 @@ ifdef test_run
 	TEST_ARGS := -run $(test_run)
 endif
 
-test_command=richgo test ./... $(TEST_ARGS) -v --cover
 
 run:
-	go run . httpsrv
+	go run . server
 
 migration:
 	go run . migrate
@@ -22,7 +21,7 @@ mockgen: mock_product_repository \
 	mock_product_usecase
 
 test: check-gotest mockgen
-	SVC_DISABLE_CACHING=true $(test_command)
+	SVC_DISABLE_CACHING=true richgo test ./... $(TEST_ARGS) -v --cover
 
 check-gotest:
 ifeq (, $(shell which richgo))

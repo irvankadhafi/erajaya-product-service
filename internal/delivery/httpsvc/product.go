@@ -85,9 +85,7 @@ func (s *Service) handleGetAllProducts() echo.HandlerFunc {
 				Page:      page,
 			},
 		}
-		if !hasMore {
-			res.MetaInfo.NextPage = 0
-		} else {
+		if hasMore {
 			res.MetaInfo.NextPage = page + 1
 		}
 
