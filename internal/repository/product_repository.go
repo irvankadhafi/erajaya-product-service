@@ -38,7 +38,6 @@ func (p *productRepository) FindByID(ctx context.Context, id int64) (*model.Prod
 			logger.Error(err)
 			return nil, err
 		}
-
 		if reply != nil {
 			return reply, nil
 		}

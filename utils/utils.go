@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"google.golang.org/grpc/metadata"
 	"math/rand"
+	"strconv"
 	"time"
 )
 
@@ -46,4 +47,12 @@ func FormatTimeRFC3339(t *time.Time) (s string) {
 		return time.Time{}.Format(time.RFC3339Nano)
 	}
 	return t.Format(time.RFC3339Nano)
+}
+
+func StringToInt(s string) int {
+	i, err := strconv.Atoi(s)
+	if err != nil {
+		return 0
+	}
+	return i
 }

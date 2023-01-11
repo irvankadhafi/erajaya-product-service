@@ -2,13 +2,7 @@ package cache
 
 import (
 	redigo "github.com/gomodule/redigo/redis"
-	"github.com/sirupsen/logrus"
 	"time"
-)
-
-const (
-	defaultTTL    = 10 * time.Second
-	defaultNilTTL = 5 * time.Minute
 )
 
 type Cache interface {
@@ -35,8 +29,8 @@ func NewCache() Cache {
 
 // SetDefaultTTL sets the defaultTTL field of the cacheManager struct to the given duration.
 // The defaultTTL field specifies the default time-to-live (TTL) for items in the cache.
-func (c *cache) SetDefaultTTL(d time.Duration) {
-	c.defaultTTL = d
+func (c *cache) SetDefaultTTL(dur time.Duration) {
+	c.defaultTTL = dur
 }
 
 func (c *cache) SetConnectionPool(conn *redigo.Pool) {
@@ -45,7 +39,6 @@ func (c *cache) SetConnectionPool(conn *redigo.Pool) {
 
 func (c *cache) Get(key string) (cachedItem any, err error) {
 	cachedItem, err = c.get(key)
-	logrus.Warn(cachedItem)
 	if err != nil && err != ErrKeyNotExist && err != redigo.ErrNil || cachedItem != nil {
 		return
 	}
