@@ -80,7 +80,7 @@ func (p *productRepository) Create(ctx context.Context, product *model.Product) 
 	return nil
 }
 
-func (p *productRepository) SearchByPage(ctx context.Context, criteria model.ProductSearchCriteria) (ids []int64, count int64, err error) {
+func (p *productRepository) SearchByPage(ctx context.Context, criteria model.ProductCriteria) (ids []int64, count int64, err error) {
 	logger := logrus.WithFields(logrus.Fields{
 		"ctx":      utils.DumpIncomingContext(ctx),
 		"criteria": utils.Dump(criteria),

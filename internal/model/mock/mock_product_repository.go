@@ -65,7 +65,7 @@ func (mr *MockProductRepositoryMockRecorder) FindByID(arg0, arg1 interface{}) *g
 }
 
 // SearchByPage mocks base method.
-func (m *MockProductRepository) SearchByPage(arg0 context.Context, arg1 model.ProductSearchCriteria) ([]int64, int64, error) {
+func (m *MockProductRepository) SearchByPage(arg0 context.Context, arg1 model.ProductCriteria) ([]int64, int64, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "SearchByPage", arg0, arg1)
 	ret0, _ := ret[0].([]int64)

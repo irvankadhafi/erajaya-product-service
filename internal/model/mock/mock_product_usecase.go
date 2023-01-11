@@ -80,7 +80,7 @@ func (mr *MockProductUsecaseMockRecorder) FindByID(arg0, arg1 interface{}) *gomo
 }
 
 // Search mocks base method.
-func (m *MockProductUsecase) Search(arg0 context.Context, arg1 model.ProductSearchCriteria) ([]*model.Product, int64, error) {
+func (m *MockProductUsecase) Search(arg0 context.Context, arg1 model.ProductCriteria) ([]*model.Product, int64, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Search", arg0, arg1)
 	ret0, _ := ret[0].([]*model.Product)

@@ -7,7 +7,6 @@ import (
 	"github.com/irvankadhafi/erajaya-product-service/internal/model"
 	"github.com/irvankadhafi/erajaya-product-service/internal/model/mock"
 	"github.com/irvankadhafi/erajaya-product-service/utils"
-	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"reflect"
@@ -57,7 +56,7 @@ func TestProductUsecase_Create(t *testing.T) {
 		ID:          utils.GenerateID(),
 		Name:        "Apple iPhone 14 Pro Max",
 		Slug:        "apple-iphone-14-pro-max",
-		Price:       decimal.New(19000000, 0),
+		Price:       19000000,
 		Description: "Apple iPhone 14 Pro Max",
 		Quantity:    20,
 	}
@@ -126,7 +125,7 @@ func TestProductUsecase_Search(t *testing.T) {
 		productRepo: mockRepo,
 	}
 
-	testSearchCriteria := model.ProductSearchCriteria{
+	testSearchCriteria := model.ProductCriteria{
 		Page:     1,
 		Size:     2,
 		SortType: model.ProductSortTypeCreatedAtAsc,

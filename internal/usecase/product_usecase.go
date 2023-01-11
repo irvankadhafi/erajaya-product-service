@@ -115,7 +115,7 @@ func (p *productUsecase) Create(ctx context.Context, input model.CreateProductIn
 	return p.FindByID(ctx, product.ID)
 }
 
-func (p *productUsecase) Search(ctx context.Context, criteria model.ProductSearchCriteria) (products []*model.Product, count int64, err error) {
+func (p *productUsecase) Search(ctx context.Context, criteria model.ProductCriteria) (products []*model.Product, count int64, err error) {
 	logger := logrus.WithFields(logrus.Fields{
 		"ctx":      utils.DumpIncomingContext(ctx),
 		"criteria": utils.Dump(criteria),

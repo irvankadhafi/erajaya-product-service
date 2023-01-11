@@ -1,15 +1,12 @@
 package db
 
 import (
-	"context"
-	"fmt"
 	"github.com/irvankadhafi/erajaya-product-service/internal/config"
 	"github.com/jpillora/backoff"
 	log "github.com/sirupsen/logrus"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	gormLogger "gorm.io/gorm/logger"
-	"regexp"
 	"time"
 )
 
@@ -19,8 +16,6 @@ var (
 
 	// StopTickerCh signal for closing ticker channel
 	StopTickerCh chan bool
-
-	sqlRegexp = regexp.MustCompile(`(\$\d+)|\?`)
 )
 
 // InitializePostgresConn :nodoc:
@@ -34,8 +29,6 @@ func InitializePostgresConn() {
 	StopTickerCh = make(chan bool)
 
 	go checkConnection(time.NewTicker(config.DatabasePingInterval()))
-
-	PostgreSQL.Logger = NewGormCustomLogger()
 
 	switch config.LogLevel() {
 	case "error":
@@ -94,8 +87,8 @@ func reconnectPostgresConn() {
 }
 
 func openPostgresConn(dsn string) (*gorm.DB, error) {
-	dialector := postgres.Open(dsn)
-	db, err := gorm.Open(dialector, &gorm.Config{})
+	psqlDialector := postgres.Open(dsn)
+	db, err := gorm.Open(psqlDialector, &gorm.Config{})
 	if err != nil {
 		return nil, err
 	}
@@ -109,76 +102,4 @@ func openPostgresConn(dsn string) (*gorm.DB, error) {
 	conn.SetConnMaxLifetime(config.DatabaseConnMaxLifetime())
 
 	return db, nil
-}
-
-// GormCustomLogger override gorm logger
-type GormCustomLogger struct {
-	gormLogger.Config
-}
-
-// NewGormCustomLogger :nodoc:
-func NewGormCustomLogger() *GormCustomLogger {
-	return &GormCustomLogger{Config: gormLogger.Config{
-		LogLevel: gormLogger.Silent,
-		Colorful: true,
-	}}
-}
-
-// LogMode :nodoc:
-func (g *GormCustomLogger) LogMode(level gormLogger.LogLevel) gormLogger.Interface {
-	g.LogLevel = level
-	return g
-}
-
-// Info :nodoc:
-func (g *GormCustomLogger) Info(ctx context.Context, message string, values ...interface{}) {
-	if g.LogLevel >= gormLogger.Info {
-		log.WithFields(log.Fields{"data": values}).Error(message)
-	}
-}
-
-// Warn :nodoc:
-func (g *GormCustomLogger) Warn(ctx context.Context, message string, values ...interface{}) {
-	if g.LogLevel >= gormLogger.Warn {
-		log.WithFields(log.Fields{"data": values}).Warn(message)
-	}
-
-}
-
-// Error :nodoc:
-func (g *GormCustomLogger) Error(ctx context.Context, message string, values ...interface{}) {
-	if g.LogLevel >= gormLogger.Error {
-		log.WithFields(log.Fields{"data": values}).Error(message)
-	}
-}
-
-// Trace :nodoc:
-func (g *GormCustomLogger) Trace(ctx context.Context, begin time.Time, fc func() (string, int64), err error) {
-	sql, rows := fc()
-	if g.LogLevel <= 0 {
-		return
-	}
-
-	elapsed := time.Since(begin)
-	logger := log.WithFields(log.Fields{
-		"took": elapsed,
-	})
-
-	sqlLog := sqlRegexp.ReplaceAllString(sql, "%v")
-	if rows >= 0 {
-		logger.WithField("rows", rows)
-	} else {
-		logger.WithField("rows", "-")
-	}
-
-	switch {
-	case err != nil && g.LogLevel >= gormLogger.Error:
-		logger.WithField("sql", sqlLog).Error(err)
-	case elapsed > g.SlowThreshold && g.SlowThreshold != 0 && g.LogLevel >= gormLogger.Warn:
-		slowLog := fmt.Sprintf("SLOW SQL >= %v", g.SlowThreshold)
-		logger.WithField("sql", sqlLog).Warn(slowLog)
-	case g.LogLevel >= gormLogger.Info:
-		logger.Info(sqlLog)
-
-	}
 }

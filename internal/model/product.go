@@ -5,7 +5,7 @@ import (
 	"time"
 )
 
-// Product :nodoc:
+// Product model
 type Product struct {
 	ID          int64     `json:"id" gorm:"primary_key"`
 	Name        string    `json:"name"`
@@ -17,31 +17,32 @@ type Product struct {
 	UpdatedAt   time.Time `json:"updated_at" sql:"DEFAULT:'now()':::STRING::TIMESTAMP"`
 }
 
-// ProductUsecase :nodoc:
-type ProductUsecase interface {
-	FindByID(ctx context.Context, id int64) (*Product, error)
-	FindAllByIDs(ctx context.Context, ids []int64) (products []*Product)
-	Search(ctx context.Context, criteria ProductSearchCriteria) (products []*Product, count int64, err error)
-
-	Create(ctx context.Context, input CreateProductInput) (*Product, error)
-}
-
-// ProductRepository :nodoc:
+// ProductRepository repository
 type ProductRepository interface {
 	FindByID(ctx context.Context, id int64) (*Product, error)
-	SearchByPage(ctx context.Context, criteria ProductSearchCriteria) (ids []int64, count int64, err error)
+	SearchByPage(ctx context.Context, criteria ProductCriteria) (ids []int64, count int64, err error)
 
 	Create(ctx context.Context, product *Product) error
 }
 
+// ProductUsecase usecase
+type ProductUsecase interface {
+	FindByID(ctx context.Context, id int64) (*Product, error)
+	FindAllByIDs(ctx context.Context, ids []int64) (products []*Product)
+	Search(ctx context.Context, criteria ProductCriteria) (products []*Product, count int64, err error)
+
+	Create(ctx context.Context, input CreateProductInput) (*Product, error)
+}
+
+// CreateProductInput create product input
 type CreateProductInput struct {
 	Name        string `json:"name" validate:"required,min=3,max=60"`
 	Description string `json:"description" validate:"max=80"`
-	Price       int64  `json:"price"`
-	Quantity    int    `json:"quantity"`
+	Price       int64  `json:"price" validate:"gte=0"`
+	Quantity    int    `json:"quantity" validate:"gt=0"`
 }
 
-// Validate :nodoc:
+// Validate validate product input
 func (c *CreateProductInput) Validate() error {
 	return validate.Struct(c)
 }
@@ -70,8 +71,7 @@ var (
 	}
 )
 
-type ProductSearchCriteria struct {
-	//Query string `json:"query"`
+type ProductCriteria struct {
 	Page     int             `json:"page"`
 	Size     int             `json:"size"`
 	SortType ProductSortType `json:"sort_type"`
