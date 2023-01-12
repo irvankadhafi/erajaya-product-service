@@ -21,6 +21,10 @@ func (s *Service) handleCreateProduct() echo.HandlerFunc {
 			logrus.Error(err)
 			return ErrInvalidArgument
 		}
+		if err := validate.Var(req.Price, "numeric"); err != nil {
+			logger.Error(err)
+			return ErrInvalidArgument
+		}
 
 		product, err := s.productUsecase.Create(ctx, model.CreateProductInput{
 			Name:        req.Name,
