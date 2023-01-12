@@ -69,6 +69,7 @@ var QueryProductSortByMap = map[ProductSortType]string{
 	ProductSortTypeNameDesc:      "name DESC",
 }
 
+// ProductSearchCriteria criteria for searching & sorting product
 type ProductSearchCriteria struct {
 	Query    string          `json:"query"`
 	Page     int             `json:"page"`
@@ -76,6 +77,7 @@ type ProductSearchCriteria struct {
 	SortType ProductSortType `json:"sort_type"`
 }
 
+// SetDefaultValue will set default value for page and size if zero
 func (c *ProductSearchCriteria) SetDefaultValue() {
 	if c.Page == 0 {
 		c.Page = 1

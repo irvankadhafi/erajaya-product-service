@@ -52,7 +52,7 @@ func StringToInt(s string) int {
 	return i
 }
 
-// StringToInt64 :nodoc:
+// StringToInt64 takes a string representation of a number and converts it to int64.
 func StringToInt64(s string) int64 {
 	i, err := strconv.ParseInt(s, 10, 64)
 	if err != nil {
@@ -61,7 +61,7 @@ func StringToInt64(s string) int64 {
 	return i
 }
 
-// Int64ToString :nodoc:
+// Int64ToString takes an int64 number and converts it to a string representation
 func Int64ToString(i int64) string {
 	s := strconv.FormatInt(i, 10)
 	return s
@@ -74,6 +74,10 @@ func CalculatePages(total, size int) int {
 	return int(math.Ceil(float64(total) / float64(size)))
 }
 
+// Int64ToRupiah takes an int64 amount and converts it to a string in Indonesian Rupiah format.
+// This function uses humanize package to add a comma as thousand separator,
+// and then replaces it with a dot to match the Rupiah format.
+// It returns a string in the format "Rp<amount>"
 func Int64ToRupiah(amount int64) string {
 	humanizeValue := humanize.CommafWithDigits(float64(amount), 0)
 	stringValue := strings.Replace(humanizeValue, ",", ".", -1)

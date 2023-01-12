@@ -4,12 +4,18 @@ ifdef test_run
 	TEST_ARGS := -run $(test_run)
 endif
 
+migrate_up=go run . migrate --direction=up --step=0
+migrate_down=go run . migrate --direction=down --step=0
 
 run:
 	go run . server
 
-migration:
-	go run . migrate
+migrate:
+	@if [ "$(DIRECTION)" = "" ] || [ "$(STEP)" = "" ]; then\
+    	$(migrate_up);\
+	else\
+		go run . migrate --direction=$(DIRECTION) --step=$(STEP);\
+    fi
 
 mock_product_repository:
 	mockgen -destination=internal/model/mock/mock_product_repository.go -package=mock github.com/irvankadhafi/erajaya-product-service/internal/model ProductRepository

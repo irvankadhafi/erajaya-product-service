@@ -105,7 +105,7 @@ func (p *productRepository) FindBySlug(ctx context.Context, slug string) (*model
 	return p.FindByID(ctx, id)
 }
 
-// Create create product
+// Create product
 func (p *productRepository) Create(ctx context.Context, product *model.Product) error {
 	logger := logrus.WithFields(logrus.Fields{
 		"ctx":     utils.DumpIncomingContext(ctx),

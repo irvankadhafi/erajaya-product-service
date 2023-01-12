@@ -6,6 +6,7 @@ import (
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/irvankadhafi/erajaya-product-service/internal/model"
 	"github.com/irvankadhafi/erajaya-product-service/utils"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"gorm.io/gorm"
 	"testing"
@@ -189,5 +190,92 @@ func TestProductRepository_SearchByPage(t *testing.T) {
 		require.NoError(t, err)
 		require.Equal(t, len(productIDs), len(actualProductIDs))
 		require.Equal(t, expectedCount, count)
+	})
+}
+
+func TestProductRepository_FindBySlug(t *testing.T) {
+	initializeTest()
+	kit, closer := initializeRepoTestKit(t)
+	defer closer()
+	mock := kit.dbmock
+
+	ctx := context.TODO()
+	repo := &productRepository{
+		db:    kit.db,
+		cache: kit.cache,
+	}
+
+	product := &model.Product{
+		ID:          utils.GenerateID(),
+		Name:        "Apple iPhone 14 Pro Max",
+		Slug:        "apple-iphone-14-pro-max",
+		Price:       19000000,
+		Description: "Apple iPhone 14 Pro Max",
+		Quantity:    20,
+	}
+
+	t.Run("ok", func(t *testing.T) {
+		defer kit.miniredis.FlushDB()
+		rows := sqlmock.NewRows([]string{
+			"id",
+			"name",
+			"slug",
+			"price",
+			"description",
+			"quantity",
+		})
+		rows.AddRow(product.ID,
+			product.Name,
+			product.Slug,
+			product.Price,
+			product.Description,
+			product.Quantity)
+
+		productIDRes := sqlmock.NewRows([]string{"id"}).AddRow(product.ID)
+
+		mock.ExpectQuery("^SELECT .+ FROM \"products\"").WillReturnRows(productIDRes)
+		mock.ExpectQuery("^SELECT .+ FROM \"products\"").WillReturnRows(rows)
+
+		res, err := repo.FindBySlug(ctx, product.Slug)
+		require.NoError(t, err)
+		require.NotNil(t, res)
+		require.True(t, kit.miniredis.Exists(repo.newCacheKeyBySlug(product.Slug)))
+	})
+
+	t.Run("success, from cache", func(t *testing.T) {
+		defer kit.miniredis.FlushDB()
+		_ = kit.miniredis.Set(repo.newCacheKeyByID(product.ID), utils.Dump(product))
+		_ = kit.miniredis.Set(repo.newCacheKeyBySlug(product.Slug), utils.Int64ToString(product.ID))
+
+		res, err := repo.FindBySlug(context.TODO(), product.Slug)
+		assert.NoError(t, err)
+		assert.EqualValues(t, product, res)
+	})
+
+	t.Run("not found", func(t *testing.T) {
+		defer kit.miniredis.FlushDB()
+		rows := sqlmock.NewRows([]string{
+			"id",
+			"name",
+			"slug",
+			"price",
+			"description",
+			"quantity",
+		})
+
+		mock.ExpectQuery("^SELECT .+ FROM \"products\"").WillReturnRows(rows)
+
+		res, err := repo.FindBySlug(ctx, product.Slug)
+		assert.NoError(t, err)
+		assert.Nil(t, res)
+
+		kit.miniredis.Exists(repo.newCacheKeyBySlug(product.Slug))
+	})
+
+	t.Run("error on db", func(t *testing.T) {
+		mock.ExpectQuery("^SELECT .+ FROM \"products\"").WillReturnError(gorm.ErrInvalidValue)
+
+		_, err := repo.FindBySlug(ctx, product.Slug)
+		assert.Equal(t, gorm.ErrInvalidValue, err)
 	})
 }

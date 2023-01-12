@@ -20,6 +20,7 @@ func NewProductUsecase(productRepo model.ProductRepository) model.ProductUsecase
 	}
 }
 
+// FindByID find product by specific id
 func (p *productUsecase) FindByID(ctx context.Context, id int64) (*model.Product, error) {
 	logger := logrus.WithFields(logrus.Fields{
 		"ctx":       utils.DumpIncomingContext(ctx),
@@ -38,6 +39,7 @@ func (p *productUsecase) FindByID(ctx context.Context, id int64) (*model.Product
 	return product, nil
 }
 
+// FindAllByIDs find all products with IDs
 func (p *productUsecase) FindAllByIDs(ctx context.Context, ids []int64) []*model.Product {
 	logger := logrus.WithFields(logrus.Fields{
 		"ctx": utils.DumpIncomingContext(ctx),
@@ -88,6 +90,7 @@ func (p *productUsecase) FindAllByIDs(ctx context.Context, ids []int64) []*model
 	return products
 }
 
+// Create product from input
 func (p *productUsecase) Create(ctx context.Context, input model.CreateProductInput) (*model.Product, error) {
 	logger := logrus.WithFields(logrus.Fields{
 		"ctx":   utils.DumpIncomingContext(ctx),
@@ -127,6 +130,7 @@ func (p *productUsecase) Create(ctx context.Context, input model.CreateProductIn
 	return p.FindByID(ctx, product.ID)
 }
 
+// Search product with given search criteria
 func (p *productUsecase) Search(ctx context.Context, criteria model.ProductSearchCriteria) (products []*model.Product, count int64, err error) {
 	logger := logrus.WithFields(logrus.Fields{
 		"ctx":      utils.DumpIncomingContext(ctx),
