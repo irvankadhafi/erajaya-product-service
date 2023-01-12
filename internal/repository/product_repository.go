@@ -229,10 +229,6 @@ func (p *productRepository) newCacheKeyBySlug(slug string) string {
 	return fmt.Sprintf("cache:object:product:slug:%s", slug)
 }
 
-func (p *productRepository) newProductCacheKeyBucket() string {
-	return fmt.Sprintf("cache:object:product")
-}
-
 func (p *productRepository) newProductCacheKeyByCriteria(criteria model.ProductSearchCriteria) string {
 	key := fmt.Sprintf("cache:object:productMultiValue:page:%d:size:%d:sortType:%s", criteria.Page, criteria.Size, string(criteria.SortType))
 
@@ -243,12 +239,10 @@ func (p *productRepository) newProductCacheKeyByCriteria(criteria model.ProductS
 	return key
 }
 
+// deleteCaches delete related cache
 func (p *productRepository) deleteCaches(productID int64) error {
-	productCacheKeyBucket := p.newProductCacheKeyBucket()
 	productCacheKey := p.newCacheKeyByID(productID)
-
 	err := p.cache.DeleteByKeys([]string{
-		productCacheKeyBucket,
 		productCacheKey,
 	})
 	if err != nil {
