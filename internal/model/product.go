@@ -75,3 +75,12 @@ type ProductSearchCriteria struct {
 	Size     int             `json:"size"`
 	SortType ProductSortType `json:"sort_type"`
 }
+
+func (c *ProductSearchCriteria) SetDefaultValue() {
+	if c.Page == 0 {
+		c.Page = 1
+	}
+	if c.Size == 0 {
+		c.Size = 10
+	}
+}

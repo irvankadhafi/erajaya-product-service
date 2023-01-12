@@ -35,3 +35,6 @@ ifdef test_run
 	$(eval TEST_ARGS := -run $(test_run))
 endif
 	$(eval test_command=$(TEST_BIN) ./... $(TEST_ARGS) -v --cover)
+
+docker:
+	@ docker-compose up -d --build

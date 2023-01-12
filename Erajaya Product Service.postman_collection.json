@@ -1,0 +1,628 @@
+{
+	"info": {
+		"_postman_id": "5049ee27-7ed4-4094-9005-133e81698ad3",
+		"name": "Erajaya Product Service",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "10454328"
+	},
+	"item": [
+		{
+			"name": "Create Product",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": " {\n    \"name\": \"Samsung S10 128GB\",\n    \"description\": \"Samsung S10\",\n    \"price\": \"15000000\",\n    \"quantity\": 20\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:4000/api/products",
+					"host": [
+						"localhost"
+					],
+					"port": "4000",
+					"path": [
+						"api",
+						"products"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "Success",
+					"originalRequest": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": " {\n    \"name\": \"Apple Iphone 14 128GB\",\n    \"description\": \"Iphone 14\",\n    \"price\": \"20000000\",\n    \"quantity\": 100\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:4000/api/products",
+							"host": [
+								"localhost"
+							],
+							"port": "4000",
+							"path": [
+								"api",
+								"products"
+							]
+						}
+					},
+					"status": "Created",
+					"code": 201,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application/json; charset=UTF-8"
+						},
+						{
+							"key": "Vary",
+							"value": "Origin"
+						},
+						{
+							"key": "Date",
+							"value": "Thu, 12 Jan 2023 01:50:17 GMT"
+						},
+						{
+							"key": "Content-Length",
+							"value": "263"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"success\": true,\n    \"data\": {\n        \"id\": 1673488217743982998,\n        \"name\": \"Apple Iphone 14 128GB\",\n        \"slug\": \"apple-iphone-14-128gb\",\n        \"description\": \"Iphone 14\",\n        \"quantity\": 100,\n        \"price\": \"Rp20.000.000\",\n        \"created_at\": \"2023-01-12T08:50:17.806853Z\",\n        \"updated_at\": \"2023-01-12T08:50:17.806853Z\"\n    }\n}"
+				},
+				{
+					"name": "Failed, Bad Request Name",
+					"originalRequest": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": " {\n    \"description\": \"Iphone 14\",\n    \"price\": \"20000000\",\n    \"quantity\": 100\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:4000/api/products",
+							"host": [
+								"localhost"
+							],
+							"port": "4000",
+							"path": [
+								"api",
+								"products"
+							]
+						}
+					},
+					"status": "Bad Request",
+					"code": 400,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application/json; charset=UTF-8"
+						},
+						{
+							"key": "Vary",
+							"value": "Origin"
+						},
+						{
+							"key": "Date",
+							"value": "Thu, 12 Jan 2023 01:50:48 GMT"
+						},
+						{
+							"key": "Content-Length",
+							"value": "68"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"success\": false,\n    \"message\": {\n        \"Name\": \"Failed on the 'required' tag\"\n    }\n}"
+				},
+				{
+					"name": "Failed, Bad Request Price",
+					"originalRequest": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": " {\n    \"name\": \"Apple Iphone 14 128GB\",\n    \"description\": \"Iphone 14\",\n    \"price\": \"R20000000\",\n    \"quantity\": 100\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:4000/api/products",
+							"host": [
+								"localhost"
+							],
+							"port": "4000",
+							"path": [
+								"api",
+								"products"
+							]
+						}
+					},
+					"status": "Bad Request",
+					"code": 400,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application/json; charset=UTF-8"
+						},
+						{
+							"key": "Vary",
+							"value": "Origin"
+						},
+						{
+							"key": "Date",
+							"value": "Thu, 12 Jan 2023 01:51:14 GMT"
+						},
+						{
+							"key": "Content-Length",
+							"value": "47"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"success\": false,\n    \"message\": \"invalid argument\"\n}"
+				},
+				{
+					"name": "Failed, Bad Request Quantity",
+					"originalRequest": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": " {\n    \"name\": \"Apple Iphone 14 128GB\",\n    \"description\": \"Iphone 14\",\n    \"price\": \"20000000\",\n    \"quantity\": 0\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:4000/api/products",
+							"host": [
+								"localhost"
+							],
+							"port": "4000",
+							"path": [
+								"api",
+								"products"
+							]
+						}
+					},
+					"status": "Bad Request",
+					"code": 400,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application/json; charset=UTF-8"
+						},
+						{
+							"key": "Vary",
+							"value": "Origin"
+						},
+						{
+							"key": "Date",
+							"value": "Thu, 12 Jan 2023 01:51:39 GMT"
+						},
+						{
+							"key": "Content-Length",
+							"value": "66"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"success\": false,\n    \"message\": {\n        \"Quantity\": \"Failed on the 'gt' tag\"\n    }\n}"
+				},
+				{
+					"name": "Failed, Product Already Exist",
+					"originalRequest": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": " {\n    \"name\": \"Apple Iphone 14 128GB\",\n    \"description\": \"Iphone 14\",\n    \"price\": \"20000000\",\n    \"quantity\": 20\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:4000/api/products",
+							"host": [
+								"localhost"
+							],
+							"port": "4000",
+							"path": [
+								"api",
+								"products"
+							]
+						}
+					},
+					"status": "Bad Request",
+					"code": 400,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application/json; charset=UTF-8"
+						},
+						{
+							"key": "Vary",
+							"value": "Origin"
+						},
+						{
+							"key": "Date",
+							"value": "Thu, 12 Jan 2023 01:52:15 GMT"
+						},
+						{
+							"key": "Content-Length",
+							"value": "57"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"success\": false,\n    \"message\": \"product name already exist\"\n}"
+				}
+			]
+		},
+		{
+			"name": "Search Product",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:4000/api/products?query=&page=1&size=10&sortBy=CREATED_AT_DESC",
+					"host": [
+						"localhost"
+					],
+					"port": "4000",
+					"path": [
+						"api",
+						"products"
+					],
+					"query": [
+						{
+							"key": "query",
+							"value": ""
+						},
+						{
+							"key": "page",
+							"value": "1"
+						},
+						{
+							"key": "size",
+							"value": "10"
+						},
+						{
+							"key": "sortBy",
+							"value": "CREATED_AT_DESC",
+							"description": "CREATED_AT_ASC, CREATED_AT_DESC, PRICE_ASC, PRICE_DESC, NAME_ASC, NAME_DESC"
+						}
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "success, find all with cheapest price",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:4000/api/products?query=&page=1&size=10&sortBy=PRICE_ASC",
+							"host": [
+								"localhost"
+							],
+							"port": "4000",
+							"path": [
+								"api",
+								"products"
+							],
+							"query": [
+								{
+									"key": "query",
+									"value": ""
+								},
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "size",
+									"value": "10"
+								},
+								{
+									"key": "sortBy",
+									"value": "PRICE_ASC",
+									"description": "CREATED_AT_ASC, CREATED_AT_DESC, PRICE_ASC, PRICE_DESC, NAME_ASC, NAME_DESC"
+								}
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application/json; charset=UTF-8"
+						},
+						{
+							"key": "Vary",
+							"value": "Origin"
+						},
+						{
+							"key": "Date",
+							"value": "Thu, 12 Jan 2023 01:55:40 GMT"
+						},
+						{
+							"key": "Content-Length",
+							"value": "579"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"success\": true,\n    \"data\": {\n        \"items\": [\n            {\n                \"id\": 1673488524763738568,\n                \"name\": \"Samsung S10 128GB\",\n                \"slug\": \"samsung-s10-128gb\",\n                \"description\": \"Samsung S10\",\n                \"quantity\": 20,\n                \"price\": \"Rp15.000.000\",\n                \"created_at\": \"2023-01-12T08:55:24.777905Z\",\n                \"updated_at\": \"2023-01-12T08:55:24.777905Z\"\n            },\n            {\n                \"id\": 1673488217743982998,\n                \"name\": \"Apple Iphone 14 128GB\",\n                \"slug\": \"apple-iphone-14-128gb\",\n                \"description\": \"Iphone 14\",\n                \"quantity\": 100,\n                \"price\": \"Rp20.000.000\",\n                \"created_at\": \"2023-01-12T08:50:17.806853Z\",\n                \"updated_at\": \"2023-01-12T08:50:17.806853Z\"\n            }\n        ],\n        \"meta_info\": {\n            \"size\": 10,\n            \"count\": 2,\n            \"count_page\": 1,\n            \"page\": 1,\n            \"next_page\": 0\n        }\n    }\n}"
+				},
+				{
+					"name": "success, find all with asc name",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:4000/api/products?query=&page=1&size=10&sortBy=NAME_ASC",
+							"host": [
+								"localhost"
+							],
+							"port": "4000",
+							"path": [
+								"api",
+								"products"
+							],
+							"query": [
+								{
+									"key": "query",
+									"value": ""
+								},
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "size",
+									"value": "10"
+								},
+								{
+									"key": "sortBy",
+									"value": "NAME_ASC",
+									"description": "CREATED_AT_ASC, CREATED_AT_DESC, PRICE_ASC, PRICE_DESC, NAME_ASC, NAME_DESC"
+								}
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application/json; charset=UTF-8"
+						},
+						{
+							"key": "Vary",
+							"value": "Origin"
+						},
+						{
+							"key": "Date",
+							"value": "Thu, 12 Jan 2023 01:58:55 GMT"
+						},
+						{
+							"key": "Content-Length",
+							"value": "579"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"success\": true,\n    \"data\": {\n        \"items\": [\n            {\n                \"id\": 1673488217743982998,\n                \"name\": \"Apple Iphone 14 128GB\",\n                \"slug\": \"apple-iphone-14-128gb\",\n                \"description\": \"Iphone 14\",\n                \"quantity\": 100,\n                \"price\": \"Rp20.000.000\",\n                \"created_at\": \"2023-01-12T08:50:17.806853Z\",\n                \"updated_at\": \"2023-01-12T08:50:17.806853Z\"\n            },\n            {\n                \"id\": 1673488524763738568,\n                \"name\": \"Samsung S10 128GB\",\n                \"slug\": \"samsung-s10-128gb\",\n                \"description\": \"Samsung S10\",\n                \"quantity\": 20,\n                \"price\": \"Rp15.000.000\",\n                \"created_at\": \"2023-01-12T08:55:24.777905Z\",\n                \"updated_at\": \"2023-01-12T08:55:24.777905Z\"\n            }\n        ],\n        \"meta_info\": {\n            \"size\": 10,\n            \"count\": 2,\n            \"count_page\": 1,\n            \"page\": 1,\n            \"next_page\": 0\n        }\n    }\n}"
+				},
+				{
+					"name": "success, find all with newest product",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:4000/api/products?query=&page=1&size=10&sortBy=CREATED_AT_DESC",
+							"host": [
+								"localhost"
+							],
+							"port": "4000",
+							"path": [
+								"api",
+								"products"
+							],
+							"query": [
+								{
+									"key": "query",
+									"value": ""
+								},
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "size",
+									"value": "10"
+								},
+								{
+									"key": "sortBy",
+									"value": "CREATED_AT_DESC",
+									"description": "CREATED_AT_ASC, CREATED_AT_DESC, PRICE_ASC, PRICE_DESC, NAME_ASC, NAME_DESC"
+								}
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application/json; charset=UTF-8"
+						},
+						{
+							"key": "Vary",
+							"value": "Origin"
+						},
+						{
+							"key": "Date",
+							"value": "Thu, 12 Jan 2023 01:59:46 GMT"
+						},
+						{
+							"key": "Content-Length",
+							"value": "579"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"success\": true,\n    \"data\": {\n        \"items\": [\n            {\n                \"id\": 1673488524763738568,\n                \"name\": \"Samsung S10 128GB\",\n                \"slug\": \"samsung-s10-128gb\",\n                \"description\": \"Samsung S10\",\n                \"quantity\": 20,\n                \"price\": \"Rp15.000.000\",\n                \"created_at\": \"2023-01-12T08:55:24.777905Z\",\n                \"updated_at\": \"2023-01-12T08:55:24.777905Z\"\n            },\n            {\n                \"id\": 1673488217743982998,\n                \"name\": \"Apple Iphone 14 128GB\",\n                \"slug\": \"apple-iphone-14-128gb\",\n                \"description\": \"Iphone 14\",\n                \"quantity\": 100,\n                \"price\": \"Rp20.000.000\",\n                \"created_at\": \"2023-01-12T08:50:17.806853Z\",\n                \"updated_at\": \"2023-01-12T08:50:17.806853Z\"\n            }\n        ],\n        \"meta_info\": {\n            \"size\": 10,\n            \"count\": 2,\n            \"count_page\": 1,\n            \"page\": 1,\n            \"next_page\": 0\n        }\n    }\n}"
+				},
+				{
+					"name": "success, with query search",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:4000/api/products?query=apple&page=1&size=10&sortBy=CREATED_AT_DESC",
+							"host": [
+								"localhost"
+							],
+							"port": "4000",
+							"path": [
+								"api",
+								"products"
+							],
+							"query": [
+								{
+									"key": "query",
+									"value": "apple"
+								},
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "size",
+									"value": "10"
+								},
+								{
+									"key": "sortBy",
+									"value": "CREATED_AT_DESC",
+									"description": "CREATED_AT_ASC, CREATED_AT_DESC, PRICE_ASC, PRICE_DESC, NAME_ASC, NAME_DESC"
+								}
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application/json; charset=UTF-8"
+						},
+						{
+							"key": "Vary",
+							"value": "Origin"
+						},
+						{
+							"key": "Date",
+							"value": "Thu, 12 Jan 2023 02:00:11 GMT"
+						},
+						{
+							"key": "Content-Length",
+							"value": "347"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"success\": true,\n    \"data\": {\n        \"items\": [\n            {\n                \"id\": 1673488217743982998,\n                \"name\": \"Apple Iphone 14 128GB\",\n                \"slug\": \"apple-iphone-14-128gb\",\n                \"description\": \"Iphone 14\",\n                \"quantity\": 100,\n                \"price\": \"Rp20.000.000\",\n                \"created_at\": \"2023-01-12T08:50:17.806853Z\",\n                \"updated_at\": \"2023-01-12T08:50:17.806853Z\"\n            }\n        ],\n        \"meta_info\": {\n            \"size\": 10,\n            \"count\": 1,\n            \"count_page\": 1,\n            \"page\": 1,\n            \"next_page\": 0\n        }\n    }\n}"
+				},
+				{
+					"name": "success, null items",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:4000/api/products?query=x&page=1&size=10&sortBy=CREATED_AT_DESC",
+							"host": [
+								"localhost"
+							],
+							"port": "4000",
+							"path": [
+								"api",
+								"products"
+							],
+							"query": [
+								{
+									"key": "query",
+									"value": "x"
+								},
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "size",
+									"value": "10"
+								},
+								{
+									"key": "sortBy",
+									"value": "CREATED_AT_DESC",
+									"description": "CREATED_AT_ASC, CREATED_AT_DESC, PRICE_ASC, PRICE_DESC, NAME_ASC, NAME_DESC"
+								}
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application/json; charset=UTF-8"
+						},
+						{
+							"key": "Vary",
+							"value": "Origin"
+						},
+						{
+							"key": "Date",
+							"value": "Thu, 12 Jan 2023 02:01:04 GMT"
+						},
+						{
+							"key": "Content-Length",
+							"value": "111"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"success\": true,\n    \"data\": {\n        \"items\": null,\n        \"meta_info\": {\n            \"size\": 10,\n            \"count\": 0,\n            \"count_page\": 0,\n            \"page\": 1,\n            \"next_page\": 0\n        }\n    }\n}"
+				}
+			]
+		}
+	]
+}

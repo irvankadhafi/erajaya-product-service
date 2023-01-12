@@ -1,30 +1,48 @@
 version: '3.8'
 
 volumes:
+  api: {}
   postgres_db: {}
   redis_db: {}
 
 networks:
-  bridge:
+  erajaya:
+    driver: bridge
 
 services:
-  postgres:
+  erajaya-app:
+    container_name: full_app
+    build: .
+    ports:
+      - 4000:4000
+    restart: on-failure
+    volumes:
+      - "api:/usr/src/app/"
+    depends_on:
+      - erajaya-postgres
+      - erajaya-redis
+    networks:
+      - erajaya
+
+  erajaya-postgres:
     image: postgres:15
+    container_name: db_postgres
     environment:
       - POSTGRES_USER=irvankdhf
       - POSTGRES_PASSWORD=irvankdhf
       - POSTGRES_DB=erajaya-product-service
+    ports:
+      - '5432:5432'
     volumes:
       - "postgres_db:/var/lib/postgresql/data"
-    stdin_open: true
     networks:
-      - bridge
-    ports:
-      - "25432:5432"
-  redis:
+      - erajaya
+
+
+  erajaya-redis:
     image: redis:5.0
     networks:
-      - bridge
+      - erajaya
     environment:
       - ALLOW_EMPTY_PASSWORD=yes
     ports:
